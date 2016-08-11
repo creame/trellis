@@ -1,6 +1,7 @@
 ---
 - include: database.yml
   tags: wordpress-setup-database
+
 - include: self-signed-certificate.yml
   tags: wordpress-setup-self-signed-certificate
 
@@ -50,3 +51,6 @@
     cron_file: "wordpress-{{ item.key | replace('.', '_') }}"
   with_dict: "{{ wordpress_sites }}"
   when: site_env.disable_wp_cron and not item.value.multisite.enabled | default(false)
+
+- include: database-backup.yml
+  tags: wordpress-database-backup
