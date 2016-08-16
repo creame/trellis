@@ -17,6 +17,6 @@
     job: >
       cd {{ www_root }}/{{ item.key }}/{{ item.value.current_path | default('current') }} &&
       wp db optimize &&
-      wp db export {{ www_root }}/{{ item.key }}/db-backups/backup-`date +%Y%m%dT%H%M%S`.sql
+      wp db export {{ www_root }}/{{ item.key }}/db-backups/backup-`date +\%Y\%m\%dT\%H\%M\%S`.sql
     cron_file: "wordpress-backup-{{ item.key | replace('.', '_') }}"
   with_dict: "{{ wordpress_sites }}"
