@@ -52,5 +52,5 @@
   with_dict: "{{ wordpress_sites }}"
   when: site_env.disable_wp_cron and not item.value.multisite.enabled | default(false)
 
-- include: database-backup.yml
-  tags: wordpress-database-backup
+- include: maintenance.yml
+  tags: wordpress-maintenance
