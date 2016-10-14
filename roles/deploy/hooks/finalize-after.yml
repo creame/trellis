@@ -19,6 +19,18 @@
     chdir: "{{ deploy_helper.new_release_path }}"
   when: wp_installed | success and not project.multisite.enabled | default(false)
 
+- name: Install WP language es_ES
+  command: wp core language install es_ES
+  args:
+    chdir: "{{ deploy_helper.new_release_path }}"
+  when: wp_installed | success
+
+- name: Update WP active language
+  command: wp core language update
+  args:
+    chdir: "{{ deploy_helper.new_release_path }}"
+  when: wp_installed | success
+
 - name: Warn about updating network database.
   debug:
     msg: "Updating the network database could take a long time with a large number of sites."
