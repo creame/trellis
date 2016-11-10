@@ -9,6 +9,7 @@ ENVIRONMENTS=( "${ENVIRONMENTS[@]##*/}" )
 SITE="$(dirname "$(dirname "$(readlink -f "$0")")")"
 SITE=${SITE##*/}
 
+PROVISION_CMD="ansible-playbook server.yml -e env=$2"
 DEPLOY_CMD="ansible-playbook deploy.yml -e env=$2 -e site=$SITE"
 UPLOADS_PUSH_CMD="ansible-playbook uploads.yml -i hosts/$2 -e site=$SITE -e mode=push"
 UPLOADS_PULL_CMD="ansible-playbook uploads.yml -i hosts/$2 -e site=$SITE -e mode=pull"
@@ -41,7 +42,9 @@ if [[ ! -e $HOSTS_FILE ]]; then
   exit 0
 fi
 
-if [ $1 == "deploy" ]; then
+if [ $1 == "provision" ]; then
+  $PROVISION_CMD
+elif [ $1 == "deploy" ]; then
   $DEPLOY_CMD
 elif [ $1 == "uploads-push" ]; then
   $UPLOADS_PUSH_CMD
@@ -54,5 +57,7 @@ else
   echo "deploy"
   echo "uploads-push"
   echo "uploads-pull"
+  echo "---"
+  echo "provision"
   exit 0
 fi
