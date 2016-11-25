@@ -20,7 +20,7 @@
   when: wp_installed | success and not project.multisite.enabled | default(false)
 
 - name: Install WP language es_ES
-  command: wp core language install es_ES
+  command: wp core language install es_ES --activate
   args:
     chdir: "{{ deploy_helper.new_release_path }}"
   when: wp_installed | success
