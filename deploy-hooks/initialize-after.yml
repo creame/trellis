@@ -1,0 +1,5 @@
+---
+- name: Backup DB before make deploy
+  command: wp db export backup-before-new-deploy.sql
+  args:
+    chdir: "{{ deploy_helper.current_path }}"
