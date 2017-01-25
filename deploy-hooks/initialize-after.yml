@@ -1,14 +1,5 @@
 ---
-- name: WordPress already Installed?
-  command: wp core is-installed {{ project.multisite.enabled | default(false) | ternary('--network', '') }}
-  args:
-    chdir: "{{ deploy_helper.current_path }}"
-  register: wp_already_installed
-  changed_when: false
-  failed_when: wp_already_installed.stderr != ""
-
 - name: Backup DB before make deploy
   command: wp db export backup-before-new-deploy.sql
   args:
     chdir: "{{ deploy_helper.current_path }}"
-  when: wp_already_installed | success
