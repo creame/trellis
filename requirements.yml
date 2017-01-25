@@ -20,3 +20,7 @@
 - name: mailhog
   src: geerlingguy.mailhog
   version: 2.1.0
+
+- name: unattended
+  src: jnv.unattended-upgrades
+  version: 'v1.3.0'

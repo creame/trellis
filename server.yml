@@ -40,3 +40,13 @@
     - { role: wp-cli, tags: [wp-cli] }
     - { role: letsencrypt, tags: [letsencrypt], when: letsencrypt_enabled }
     - { role: wordpress-setup, tags: [wordpress, wordpress-setup, letsencrypt] }
+
+- name: Setup unattended-upgrades
+  hosts: web:&{{ env }}
+  become: yes
+  roles:
+  - role: unattended
+    unattended_mail: '{{ mail_admin }}'
+    unattended_mail_only_on_error: false
+    unattended_automatic_reboot_time: '04:{{ 60 | random }}'
+    tags: [upgrades]
