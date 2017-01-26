@@ -9,12 +9,6 @@ ENVIRONMENTS=( "${ENVIRONMENTS[@]##*/}" )
 SITE="$(dirname "$(dirname "$(readlink -f "$0")")")"
 SITE=${SITE##*/}
 
-PROVISION_CMD="ansible-playbook server.yml -e env=$2"
-DEPLOY_CMD="ansible-playbook deploy.yml -e env=$2 -e site=$SITE"
-UPLOADS_PUSH_CMD="ansible-playbook uploads.yml -i hosts/$2 -e site=$SITE -e mode=push"
-UPLOADS_PULL_CMD="ansible-playbook uploads.yml -i hosts/$2 -e site=$SITE -e mode=pull"
-
-
 show_usage() {
   echo "Usage: ./do.sh <action> <environment>
 
@@ -30,12 +24,20 @@ Examples:
 "
 }
 
-HOSTS_FILE="hosts/$2"
-
 [[ $# -ne $NUM_ARGS || $1 = -h ]] && { show_usage; exit 0; }
 
+# allow use of first letter of environment
+ENV=$2
+if [ $ENV == "p" ]; then
+  ENV="production"
+elif [ $ENV == "s" ]; then
+  ENV="staging"
+fi
+
+HOSTS_FILE="hosts/$ENV"
+
 if [[ ! -e $HOSTS_FILE ]]; then
-  echo "Error: <$2> is not a valid environment ($HOSTS_FILE does not exist)."
+  echo "Error: <$ENV> is not a valid environment ($HOSTS_FILE does not exist)."
   echo
   echo "Available environments:"
   ( IFS=$'\n'; echo "${ENVIRONMENTS[*]}" )
@@ -43,22 +45,22 @@ if [[ ! -e $HOSTS_FILE ]]; then
 fi
 
 if [ $1 == "provision" ]; then
-  $PROVISION_CMD
+  ansible-playbook server.yml -e env=$ENV
 elif [ $1 == "deploy" ]; then
-  $DEPLOY_CMD
+  ansible-playbook deploy.yml -e env=$ENV -e site=$SITE
 elif [ $1 == "uploads-push" ]; then
-  $UPLOADS_PUSH_CMD
+  ansible-playbook uploads.yml -i hosts/$ENV -e site=$SITE -e mode=push
 elif [ $1 == "uploads-pull" ]; then
-  $UPLOADS_PULL_CMD
+  ansible-playbook uploads.yml -i hosts/$ENV -e site=$SITE -e mode=pull
 elif [ $1 == "ssh-web" ]; then
-  ssh web@$(cat hosts/$2 | sed -n 5p)
+  ssh web@$(cat hosts/$ENV | sed -n 5p)
 elif [ $1 == "ssh-admin" ]; then
   echo
-  ansible-vault view group_vars/$2/vault.yml | grep "    password:"
+  ansible-vault view group_vars/$ENV/vault.yml | grep "    password:"
   echo
-  ssh admin@$(cat hosts/$2 | sed -n 5p)
+  ssh admin@$(cat hosts/$ENV | sed -n 5p)
 else
-  echo "Error: $1 is not a valid action."
+  echo "Error: <$1> is not a valid action."
   echo
   echo "Available actions:"
   echo "provision"
