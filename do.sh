@@ -16,9 +16,9 @@ UPLOADS_PULL_CMD="ansible-playbook uploads.yml -i hosts/$2 -e site=$SITE -e mode
 
 
 show_usage() {
-  echo "Usage: do <action> <environment>
+  echo "Usage: ./do.sh <action> <environment>
 
-<action> is the action to perform (deploy, uploads-push, uploads-pull)
+<action> is the action to perform (deploy, uploads-push...)
 <environment> is the environment to deploy to (staging, production, etc)
 
 Available environments:
@@ -35,7 +35,7 @@ HOSTS_FILE="hosts/$2"
 [[ $# -ne $NUM_ARGS || $1 = -h ]] && { show_usage; exit 0; }
 
 if [[ ! -e $HOSTS_FILE ]]; then
-  echo "Error: $2 is not a valid environment ($HOSTS_FILE does not exist)."
+  echo "Error: <$2> is not a valid environment ($HOSTS_FILE does not exist)."
   echo
   echo "Available environments:"
   ( IFS=$'\n'; echo "${ENVIRONMENTS[*]}" )
@@ -50,14 +50,20 @@ elif [ $1 == "uploads-push" ]; then
   $UPLOADS_PUSH_CMD
 elif [ $1 == "uploads-pull" ]; then
   $UPLOADS_PULL_CMD
+elif [ $1 == "ssh-web" ]; then
+  ssh web@$(cat hosts/$2 | sed -n 5p)
+elif [ $1 == "ssh-admin" ]; then
+  echo
+  ansible-vault view group_vars/$2/vault.yml | grep "    password:"
+  echo
+  ssh admin@$(cat hosts/$2 | sed -n 5p)
 else
   echo "Error: $1 is not a valid action."
   echo
   echo "Available actions:"
-  echo "deploy"
-  echo "uploads-push"
-  echo "uploads-pull"
-  echo "---"
   echo "provision"
+  echo "deploy"
+  echo "uploads-push / uploads-pull"
+  echo "ssh-web / ssh-admin"
   exit 0
 fi
