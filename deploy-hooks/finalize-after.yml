@@ -47,6 +47,11 @@
     args:
       chdir: "{{ deploy_helper.current_path }}"
 
+  - name: Update active language
+    command: wp core language update
+    args:
+      chdir: "{{ deploy_helper.current_path }}"
+
   when: wp_installed | success
 
 - name: Reload php-fpm
