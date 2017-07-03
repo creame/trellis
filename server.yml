@@ -47,6 +47,6 @@
   roles:
   - role: unattended
     unattended_mail: '{{ mail_admin }}'
-    unattended_mail_only_on_error: false
-    unattended_automatic_reboot_time: '04:{{ 60 | random }}'
+    unattended_mail_only_on_error: true
+    unattended_automatic_reboot_time: '05:{{ 60 | random }}'
     tags: [upgrades]
