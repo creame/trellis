@@ -10,4 +10,14 @@
     args:
       chdir: "{{ deploy_helper.current_path }}"
 
-  when: wp_installed | success
+  - name: Flush WP rewrite rules
+    command: wp rewrite flush --hard
+    args:
+      chdir: "{{ deploy_helper.current_path }}"
+
+  - name: Clear Autoptimize cache
+    command: wp autoptimize clear 2>/dev/null
+    args:
+      chdir: "{{ deploy_helper.current_path }}"
+
+  when: wp_installed.rc == 0
