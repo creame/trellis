@@ -24,13 +24,16 @@ Examples:
 "
 }
 
-[[ $# -ne $NUM_ARGS || $1 = -h ]] && { show_usage; exit 0; }
+[[ $# -lt $NUM_ARGS || $1 = -h ]] && { show_usage; exit 0; }
 
-# allow use of first letter of environment
-ENV=$2
-if [ $ENV == "p" ]; then
+ACTION="$1"; shift
+ENV="$1"; shift
+EXTRA_PARAMS=$@
+
+# allow use of abbreviations of environment
+if [[ $ENV = p || $ENV = prod ]]; then
   ENV="production"
-elif [ $ENV == "s" ]; then
+elif [[ $ENV = s || $ENV = stag ]]; then
   ENV="staging"
 fi
 
@@ -44,23 +47,23 @@ if [[ ! -e $HOSTS_FILE ]]; then
   exit 0
 fi
 
-if [ $1 == "provision" ]; then
-  ansible-playbook server.yml -e env=$ENV
-elif [ $1 == "deploy" ]; then
-  ansible-playbook deploy.yml -e env=$ENV -e site=$SITE
-elif [ $1 == "uploads-push" ]; then
+if [ $ACTION == "provision" ]; then
+  ansible-playbook server.yml -e env=$ENV $EXTRA_PARAMS
+elif [ $ACTION == "deploy" ]; then
+  ansible-playbook deploy.yml -e env=$ENV -e site=$SITE $EXTRA_PARAMS
+elif [ $ACTION == "uploads-push" ]; then
   ansible-playbook uploads.yml -i hosts/$ENV -e site=$SITE -e mode=push
-elif [ $1 == "uploads-pull" ]; then
+elif [ $ACTION == "uploads-pull" ]; then
   ansible-playbook uploads.yml -i hosts/$ENV -e site=$SITE -e mode=pull
-elif [ $1 == "ssh-web" ]; then
+elif [ $ACTION == "ssh-web" ]; then
   ssh web@$(cat hosts/$ENV | sed -n 5p)
-elif [ $1 == "ssh-admin" ]; then
+elif [ $ACTION == "ssh-admin" ]; then
   echo
   ansible-vault view group_vars/$ENV/vault.yml | grep "    password:"
   echo
   ssh admin@$(cat hosts/$ENV | sed -n 5p)
 else
-  echo "Error: <$1> is not a valid action."
+  echo "Error: <$ACTION> is not a valid action."
   echo
   echo "Available actions:"
   echo "provision"
