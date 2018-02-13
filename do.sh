@@ -37,6 +37,11 @@ elif [[ $ENV = s || $ENV = stag ]]; then
   ENV="staging"
 fi
 
+# Import your SSH key password into Keychain on Mac OS
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  ssh-add -K
+fi
+
 HOSTS_FILE="hosts/$ENV"
 
 if [[ ! -e $HOSTS_FILE ]]; then
