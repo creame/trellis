@@ -56,8 +56,8 @@ project_local_path: "{{ (lookup('env', 'USER') == 'vagrant') | ternary(project_r
 
 # Deploy hooks
 # For list of hooks and explanation, see https://roots.io/trellis/docs/deploys/#hooks
-deploy_initialize_after:
-  # - "{{ playbook_dir }}/deploy-hooks/initialize-after.yml"
+#deploy_initialize_after:
+#  - "{{ playbook_dir }}/deploy-hooks/initialize-after.yml"
 
 deploy_build_before:
   - "{{ playbook_dir }}/deploy-hooks/build-before.yml"
