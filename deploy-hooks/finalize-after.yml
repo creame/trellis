@@ -15,9 +15,14 @@
     args:
       chdir: "{{ deploy_helper.current_path }}"
 
-  - name: Clear Autoptimize cache
-    command: wp autoptimize clear 2>/dev/null
-    args:
-      chdir: "{{ deploy_helper.current_path }}"
+  # - name: Clear Autoptimize cache
+  #   command: wp autoptimize clear 2>/dev/null
+  #   args:
+  #     chdir: "{{ deploy_helper.current_path }}"
+
+  # - name: Simple Cache enable
+  #   command: sed -i "s/define( 'WP_CACHE', false );/define( 'WP_CACHE', true );/" web/wp-config.php
+  #   args:
+  #     chdir: "{{ deploy_helper.current_path }}"
 
   when: wp_installed.rc == 0
