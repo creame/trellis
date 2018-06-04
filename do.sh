@@ -24,7 +24,7 @@ Examples:
 "
 }
 
-[[ $# -lt $NUM_ARGS || $1 = -h ]] && { show_usage; exit 0; }
+[[ $# -lt $NUM_ARGS || $1 = -h ]] && { show_usage; exit 127; }
 
 ACTION="$1"; shift
 ENV="$1"; shift
@@ -49,7 +49,7 @@ if [[ ! -e $HOSTS_FILE ]]; then
   echo
   echo "Available environments:"
   ( IFS=$'\n'; echo "${ENVIRONMENTS[*]}" )
-  exit 0
+  exit 1
 fi
 
 if [ $ACTION == "provision" ]; then
@@ -75,5 +75,5 @@ else
   echo "deploy"
   echo "uploads-push / uploads-pull"
   echo "ssh-web / ssh-admin"
-  exit 0
+  exit 1
 fi
