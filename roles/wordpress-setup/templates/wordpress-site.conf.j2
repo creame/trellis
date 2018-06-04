@@ -50,7 +50,7 @@ server {
   {% endblock -%}
 
   {% block multisite_rewrites -%}
-  rewrite ^/wp/$ / last;
+  rewrite ^/wp/?$ / last;
   {% if item.value.multisite.enabled | default(false) -%}
   # Multisite rewrites
   {% if item.value.multisite.subdomains | default(false) -%}
