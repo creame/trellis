@@ -60,6 +60,8 @@ elif [ $ACTION == "uploads-push" ]; then
   ansible-playbook uploads.yml -i hosts/$ENV -e site=$SITE -e mode=push
 elif [ $ACTION == "uploads-pull" ]; then
   ansible-playbook uploads.yml -i hosts/$ENV -e site=$SITE -e mode=pull
+elif [ $ACTION == "loco-pull" ]; then
+  ansible-playbook uploads.yml -i hosts/$ENV -e site=$SITE -e mode=loco
 elif [ $ACTION == "ssh-web" ]; then
   ssh web@$(cat hosts/$ENV | sed -n 5p)
 elif [ $ACTION == "ssh-admin" ]; then

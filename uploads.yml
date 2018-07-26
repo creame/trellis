@@ -24,3 +24,12 @@
       mode: pull
       rsync_opts: --exclude=.DS_Store
     when: mode is defined and mode == "pull"
+
+  # ansible-playbook uploads.yml -i hosts/staging --extra-vars="site=example.com mode=loco"
+  - name: Pull Loco translations
+    synchronize:
+      src: "{{ project_root }}/current/web/app/languages/loco/"
+      dest: "{{ project.local_path }}/web/app/languages/loco/"
+      mode: pull
+      rsync_opts: --exclude=.DS_Store
+    when: mode is defined and mode == "loco"
