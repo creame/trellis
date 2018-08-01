@@ -51,7 +51,7 @@
       group: "{{ ansible_user }}"
       mode: "0775"
 
-  - name: Create auth.json for packages.crea.me authentication
+  - name: Setup packages.crea.me authentication
     template:
       src: "auth.json.j2"
       dest: "/home/{{ ansible_user }}/.composer/auth.json"
