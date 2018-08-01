@@ -31,17 +31,3 @@
 #     group: no
 #     owner: no
 #     rsync_opts: --chmod=Du=rwx,--chmod=Dg=rx,--chmod=Do=rx,--chmod=Fu=rw,--chmod=Fg=r,--chmod=Fo=r
-
-- name: Create composer directory
-  file:
-    path: "/home/{{ ansible_user }}/.composer"
-    state: directory
-    owner: "{{ web_user }}"
-    group: "{{ web_group }}"
-    mode: "0775"
-
-- name: Create composer auth.json for packages.creame
-  template:
-    src: "{{ playbook_dir }}/deploy-hooks/auth.json.j2"
-    dest: "/home/{{ ansible_user }}/.composer/auth.json"
-    mode: "0600"
