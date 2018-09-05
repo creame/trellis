@@ -1,0 +1,20 @@
+{% extends 'roles/wordpress-setup/templates/wordpress-site.conf.j2' %}
+
+  {% block multisite_rewrites -%}
+  rewrite ^/wp/?$ / permanent;
+
+  {{ super() }}
+  {% endblock -%}
+
+  {% block location_uploads_php -%}
+  {{ super() }}
+
+  # Set max cache for static files
+  location ~* .(?:ogg|ogv|svg|svgz|eot|otf|woff|mp4|ttf|css|rss|atom|js|jpg|jpeg|gif|png|ico|zip|tgz|gz|rar|bz2|doc|xls|exe|ppt|tar|mid|midi|wav|bmp|rtf|cur)$ {
+    expires max;
+    log_not_found off;
+    access_log off;
+    add_header Pragma public;
+    add_header Cache-Control "public";
+  }
+  {% endblock %}

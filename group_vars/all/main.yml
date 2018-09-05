@@ -10,7 +10,10 @@ ntp_manage_config: true
 www_root: /srv/www
 ip_whitelist:
   - "{{ (env == 'development') | ternary(ansible_default_ipv4.gateway, ipify_public_ip | default('')) }}"
+nginx_wordpress_site_conf: nginx-includes/wordpress-site.conf.child
 php_memory_limit: 256M
+# php_extensions_custom:
+#   - php7.2-soap
 wp_cli_packages:
   - wp-cli/doctor-command
   - wp-cli/profile-command
