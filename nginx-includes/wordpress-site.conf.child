@@ -17,4 +17,9 @@
     add_header Pragma public;
     add_header Cache-Control "public";
   }
+
+  # Disable XML-RPC
+  location ~* xmlrpc\.php$ {
+    return 444;
+  }
   {% endblock %}
