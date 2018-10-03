@@ -15,13 +15,16 @@
     args:
       chdir: "{{ deploy_helper.current_path }}"
 
-  # - name: Clear Autoptimize cache
-  #   command: wp autoptimize clear 2>/dev/null
+  # - name: Cache Enabler re-activate
+  #   command: wp plugin {{ item }} cache-enabler
+  #   with_items:
+  #     - deactivate
+  #     - activate
   #   args:
   #     chdir: "{{ deploy_helper.current_path }}"
 
-  # - name: Simple Cache enable
-  #   command: sed -i "s/define( 'WP_CACHE', false );/define( 'WP_CACHE', true );/" web/wp-config.php
+  # - name: Clear Autoptimize cache
+  #   command: wp autoptimize clear 2>/dev/null
   #   args:
   #     chdir: "{{ deploy_helper.current_path }}"
 
