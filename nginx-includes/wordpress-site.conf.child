@@ -19,7 +19,15 @@
   }
 
   # Disable XML-RPC
-  location ~* xmlrpc\.php$ {
-    return 444;
-  }
+  location ~* xmlrpc\.php$ { return 444; }
+
+  # Protect System Files
+  location = /wp/wp-admin/install.php { deny all; }
+  location ~ /wp/readme\.html$ { deny all; }
+  location ~ /wp/readme\.txt$ { deny all; }
+  location ~ /wp-config.php$ { deny all; }
+  location ~ ^/wp/wp-admin/includes/ { deny all; }
+  location ~ ^/wp/wp-includes/[^/]+\.php$ { deny all; }
+  location ~ ^/wp/wp-includes/js/tinymce/langs/.+\.php$ { deny all; }
+  location ~ ^/wp/wp-includes/theme-compat/ { deny all; }
   {% endblock %}
