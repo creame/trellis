@@ -57,11 +57,15 @@ if [ $ACTION == "provision" ]; then
 elif [ $ACTION == "deploy" ]; then
   ansible-playbook deploy.yml -e env=$ENV -e site=$SITE $EXTRA_PARAMS
 elif [ $ACTION == "uploads-push" ]; then
-  ansible-playbook uploads.yml -i hosts/$ENV -e site=$SITE -e mode=push
+  ansible-playbook uploads.yml -e env=$ENV -e site=$SITE -e mode=push
 elif [ $ACTION == "uploads-pull" ]; then
-  ansible-playbook uploads.yml -i hosts/$ENV -e site=$SITE -e mode=pull
+  ansible-playbook uploads.yml -e env=$ENV -e site=$SITE -e mode=pull
+elif [ $ACTION == "db-push" ]; then
+  ansible-playbook database.yml -e env=$ENV -e site=$SITE -e mode=push
+elif [ $ACTION == "db-pull" ]; then
+  ansible-playbook database.yml -e env=$ENV -e site=$SITE -e mode=pull
 elif [ $ACTION == "loco-pull" ]; then
-  ansible-playbook uploads.yml -i hosts/$ENV -e site=$SITE -e mode=loco
+  ansible-playbook uploads.yml -e env=$ENV -e site=$SITE -e mode=loco
 elif [ $ACTION == "ssh-web" ]; then
   ssh web@$(cat hosts/$ENV | sed -n 5p)
 elif [ $ACTION == "ssh-admin" ]; then
@@ -76,6 +80,8 @@ else
   echo "provision"
   echo "deploy"
   echo "uploads-push / uploads-pull"
+  echo "db-push / db-pull"
+  echo "loco-pull"
   echo "ssh-web / ssh-admin"
   exit 1
 fi
