@@ -27,6 +27,7 @@ deploy_build_after:
   - "{{ playbook_dir }}/roles/deploy/hooks/build-after.yml"
 
 deploy_finalize_after:
+  - "{{ playbook_dir }}/deploy-hooks/finalize-after-install.yml"
   - "{{ playbook_dir }}/deploy-hooks/finalize-after.yml"
 
 # Values of raw_vars will be wrapped in `{% raw %}` to avoid templating problems if values include `{%` and `{{`.
