@@ -34,32 +34,14 @@
   when: item.value.packagist_token is defined
   with_dict: "{{ wordpress_sites }}"
 
-# This don't work :_(
-# - name: Setup packages.crea.me authentication
-#   composer:
-#     global_command: yes
-#     command: config
-#     arguments: http-basic.packages.crea.me creame {{ vault_creame_password }}
-#   when: vault_creame_password is defined
-
-- block:
-  - name: Create .composer directory
-    file:
-      path: "/home/{{ ansible_user }}/.composer"
-      state: directory
-      owner: "{{ ansible_user }}"
-      group: "{{ ansible_user }}"
-      mode: "0775"
-
-  - name: Setup packages.crea.me authentication
-    template:
-      src: "auth.json.j2"
-      dest: "/home/{{ ansible_user }}/.composer/auth.json"
-      owner: "{{ ansible_user }}"
-      group: "{{ ansible_user }}"
-      mode: "0665"
-
+- name: Setup packages.crea.me authentication
+  composer:
+    command: config
+    arguments: --auth http-basic.packages.crea.me creame {{ vault_creame_password }}
+    working_dir: "{{ www_root }}/{{ item.key }}/{{ item.value.current_path | default('current') }}/"
+  no_log: true
   when: vault_creame_password is defined
+  with_dict: "{{ wordpress_sites }}"
 
 - name: Install Dependencies with Composer
   composer:
