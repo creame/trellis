@@ -31,11 +31,6 @@
       chdir: "{{ deploy_helper.current_path }}"
     when: project.update_db_on_deploy | default(update_db_on_deploy)
 
-  - name: Install WP language es_ES
-    command: wp core language install es_ES --activate
-    args:
-      chdir: "{{ deploy_helper.current_path }}"
-
   - name: Install core language es_ES
     command: wp language core install es_ES
     args:
