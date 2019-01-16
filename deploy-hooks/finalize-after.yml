@@ -36,8 +36,16 @@
     args:
       chdir: "{{ deploy_helper.current_path }}"
 
-  - name: Update active language
-    command: wp core language update
+  - name: Install core language es_ES
+    command: wp language core install es_ES
+    args:
+      chdir: "{{ deploy_helper.current_path }}"
+
+  - name: Install plugins and themes language es_ES
+    shell: wp language {{ item }} list --all --fields={{ item }},language | grep es_ES | cut -f 1 | xargs -I % wp language {{ item }} install % es_ES
+    with_items:
+      - plugin
+      - theme
     args:
       chdir: "{{ deploy_helper.current_path }}"
 
@@ -63,11 +71,6 @@
       - activate
     args:
       chdir: "{{ deploy_helper.current_path }}"
-
-  # - name: Clear Autoptimize cache
-  #   command: wp autoptimize clear 2>/dev/null
-  #   args:
-  #     chdir: "{{ deploy_helper.current_path }}"
 
   when: wp_installed.rc == 0
 
