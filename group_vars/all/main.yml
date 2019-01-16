@@ -13,7 +13,7 @@ ip_whitelist:
 nginx_wordpress_site_conf: nginx-includes/wordpress-site.conf.child
 php_memory_limit: 256M
 # php_extensions_custom:
-#   - php7.2-soap
+#   - php7.3-soap
 wp_cli_packages:
   - wp-cli/doctor-command
   - wp-cli/profile-command
@@ -23,8 +23,8 @@ deploy_initialize_after:
   - "{{ playbook_dir }}/deploy-hooks/initialize-after.yml"
 
 deploy_build_after:
-  - "{{ playbook_dir }}/deploy-hooks/build-after.yml"
   - "{{ playbook_dir }}/roles/deploy/hooks/build-after.yml"
+  - "{{ playbook_dir }}/deploy-hooks/build-after.yml"
 
 deploy_finalize_after:
   - "{{ playbook_dir }}/deploy-hooks/finalize-after-install.yml"
