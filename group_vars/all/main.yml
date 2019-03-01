@@ -17,6 +17,8 @@ php_memory_limit: 256M
 wp_cli_packages:
   - wp-cli/doctor-command
   - wp-cli/profile-command
+# disable wp option update releases path on deploy
+update_wp_theme_paths: false
 
 # Custom deploy hooks
 deploy_initialize_after:
