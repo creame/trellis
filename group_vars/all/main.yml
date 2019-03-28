@@ -13,7 +13,7 @@ ip_whitelist:
 nginx_wordpress_site_conf: nginx-includes/wordpress-site.conf.child
 php_memory_limit: 256M
 # php_extensions_custom:
-#   - php7.3-soap
+#   php7.3-soap: "{{ apt_package_state }}"
 wp_cli_packages:
   - wp-cli/doctor-command
   - wp-cli/profile-command
