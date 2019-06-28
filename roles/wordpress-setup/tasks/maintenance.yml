@@ -20,7 +20,8 @@
       wp wc tool run delete_orphaned_variations --user=admin.creame &&
       wp wc tool run clear_expired_download_permissions --user=admin.creame &&
       wp wc tool run recount_terms --user=admin.creame &&
-      wp wc tool run add_order_indexes --user=admin.creame
+      wp wc tool run add_order_indexes --user=admin.creame &&
+      wp wc tool run regenerate_product_lookup_tables --user=admin.creame
     cron_file: "wordpress-{{ item.key | replace('.', '_') }}"
   with_dict: "{{ wordpress_sites }}"
   when: item.value.woocommerce | default(false)
@@ -29,7 +30,7 @@
   cron:
     name: "{{ item.key }} WordPress BD backup cron"
     hour: "4"
-    minute: "6"
+    minute: "22"
     user: "{{ web_user }}"
     job: >
       cd {{ www_root }}/{{ item.key }}/{{ item.value.current_path | default('current') }} &&
@@ -43,7 +44,7 @@
   cron:
     name: "{{ item.key }} WordPress minor updates cron"
     hour: "4"
-    minute: "10"
+    minute: "30"
     user: "{{ web_user }}"
     job: >
       cd {{ www_root }}/{{ item.key }}/{{ item.value.current_path | default('current') }} &&

@@ -31,6 +31,12 @@
       chdir: "{{ deploy_helper.current_path }}"
     when: project.update_db_on_deploy | default(update_db_on_deploy)
 
+  - name: Update WC database
+    command: wp wc update
+    args:
+      chdir: "{{ deploy_helper.current_path }}"
+    when: project.update_db_on_deploy | default(update_db_on_deploy) and project.woocommerce | default(false)
+
   - name: Install core language es_ES
     command: wp language core install es_ES
     args:
