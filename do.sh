@@ -66,6 +66,13 @@ elif [ $ACTION == "db-pull" ]; then
   ansible-playbook database.yml -e env=$ENV -e site=$SITE -e mode=pull
 elif [ $ACTION == "loco-pull" ]; then
   ansible-playbook uploads.yml -e env=$ENV -e site=$SITE -e mode=loco
+elif [ $ACTION == "pull" ]; then
+  ansible-playbook database.yml -e env=$ENV -e site=$SITE -e mode=pull
+  ansible-playbook uploads.yml -e env=$ENV -e site=$SITE -e mode=pull
+  ansible-playbook uploads.yml -e env=$ENV -e site=$SITE -e mode=loco
+elif [ $ACTION == "push" ]; then
+  ansible-playbook database.yml -e env=$ENV -e site=$SITE -e mode=push
+  ansible-playbook uploads.yml -e env=$ENV -e site=$SITE -e mode=push
 elif [ $ACTION == "ssh-web" ]; then
   ssh web@$(cat hosts/$ENV | sed -n 5p)
 elif [ $ACTION == "ssh-admin" ]; then
