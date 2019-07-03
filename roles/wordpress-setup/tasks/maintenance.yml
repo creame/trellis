@@ -30,7 +30,7 @@
   cron:
     name: "{{ item.key }} WordPress BD backup cron"
     hour: "4"
-    minute: "22"
+    minute: "15"
     user: "{{ web_user }}"
     job: >
       cd {{ www_root }}/{{ item.key }}/{{ item.value.current_path | default('current') }} &&
@@ -44,7 +44,7 @@
   cron:
     name: "{{ item.key }} WordPress minor updates cron"
     hour: "4"
-    minute: "30"
+    minute: "20"
     user: "{{ web_user }}"
     job: >
       cd {{ www_root }}/{{ item.key }}/{{ item.value.current_path | default('current') }} &&
@@ -53,3 +53,19 @@
       wp core language update
     cron_file: "wordpress-{{ item.key | replace('.', '_') }}"
   with_dict: "{{ wordpress_sites }}"
+
+- name: Setup Image optimization cron
+  cron:
+    name: "{{ item.key }} image optimization cron"
+    hour: "1"
+    minute: "5"
+    user: "{{ web_user }}"
+    job: >
+      cd {{ www_root }}/{{ item.key }}/{{ item.value.current_path | default('current') }}/web/app/uploads &&
+      find -type f -name "*.jpg" -mtime -1 -daystart -exec jpegoptim -qs {} \; &&
+      find -type f -name "*.jpg" -mtime -1 -daystart -exec sh -c 'cwebp -quiet -q 80 $1 -o "${1%.jpg}.webp"' _ {} \; &&
+      find -type f -name "*.png" -mtime -1 -daystart -exec optipng  -quiet -o4 {} \; &&
+      find -type f -name "*.png" -mtime -1 -daystart -exec sh -c 'cwebp -quiet -lossless $1 -o "${1%.png}.webp"' _ {} \;
+    cron_file: "wordpress-images-{{ item.key | replace('.', '_') }}"
+  with_dict: "{{ wordpress_sites }}"
+  when: image_optimize | default(false)

@@ -1,0 +1,15 @@
+{% extends 'roles/nginx/templates/nginx.conf.j2' %}
+
+  {% block http_begin -%}
+  {% if image_optimize | default(false) -%}
+  map $http_accept $webp_ext {
+    default "";
+    "~image\/webp" ".webp";
+  }
+
+  map $uri $file_ext {
+    default "";
+    "~(\.\w+)$" $1;
+  }
+  {% endif -%}
+  {% endblock %}

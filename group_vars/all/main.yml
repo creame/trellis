@@ -5,11 +5,16 @@ apt_cache_valid_time: 3600
 apt_package_state: present
 apt_security_package_state: latest
 apt_dev_package_state: latest
+apt_packages_custom:
+  jpegoptim: "{{ apt_package_state }}"
+  optipng: "{{ apt_package_state }}"
+  webp: "{{ apt_package_state }}"
 ntp_timezone: Etc/UTC
 ntp_manage_config: true
 www_root: /srv/www
 ip_whitelist:
   - "{{ (env == 'development') | ternary(ansible_default_ipv4.gateway, ipify_public_ip | default('')) }}"
+nginx_conf: nginx-includes/nginx.conf.child
 nginx_wordpress_site_conf: nginx-includes/wordpress-site.conf.child
 php_memory_limit: 256M
 # php_extensions_custom:
@@ -17,8 +22,10 @@ php_memory_limit: 256M
 wp_cli_packages:
   - wp-cli/doctor-command
   - wp-cli/profile-command
-# disable wp option update releases path on deploy
+# Disable wp option update releases path on deploy
 update_wp_theme_paths: false
+# Enable image optimization cron task and serve webp format
+image_optimize: true
 
 # Custom deploy hooks
 deploy_initialize_after:

@@ -9,8 +9,21 @@
   {% block location_uploads_php -%}
   {{ super() }}
 
+  {% if image_optimize | default(false) -%}
+  # Try to server WebP images (if exists)
+  location ~* "^(?<path>.+)\.(png|jpg)$" {
+    expires max;
+    log_not_found off;
+    access_log off;
+    add_header Pragma public;
+    add_header Cache-Control "public";
+
+    try_files $path$webp_ext $path$file_ext =404;
+  }
+  {% endif -%}
+
   # Set max cache for static files
-  location ~* .(?:ogg|ogv|svg|svgz|eot|otf|woff|mp4|ttf|css|rss|atom|js|jpg|jpeg|gif|png|ico|zip|tgz|gz|rar|bz2|doc|xls|exe|ppt|tar|mid|midi|wav|bmp|rtf|cur)$ {
+  location ~* .(?:ogg|ogv|svg|svgz|eot|otf|woff2?|mp4|ttf|css|rss|atom|js|jpg|jpeg|gif|png|webp|ico|zip|tgz|gz|rar|bz2|doc|xls|exe|ppt|tar|mid|midi|wav|bmp|rtf|cur)$ {
     expires max;
     log_not_found off;
     access_log off;
