@@ -1,6 +1,6 @@
 ---
 - name: Install Wordpress
-  command: wp core install --url="{{ project.site_hosts | map(attribute='canonical') | first }}" --title={{ site }} --admin_user=admin.creame --admin_email=servicios+{{ site }}@crea.me
+  command: wp core install --url="{{ project.site_hosts | map(attribute='canonical') | first }}" --title={{ site }} --admin_user=admin.creame --admin_email=servicios+{{ site }}@crea.me --skip-email
   args:
     chdir: "{{ deploy_helper.current_path }}"
   when: wp_installed.rc != 0
