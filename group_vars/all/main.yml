@@ -30,14 +30,19 @@ image_optimize: true
 # Custom deploy hooks
 deploy_initialize_after:
   - "{{ playbook_dir }}/deploy-hooks/initialize-after.yml"
-
 deploy_build_after:
   - "{{ playbook_dir }}/deploy-hooks/build-after.yml"
   - "{{ playbook_dir }}/roles/deploy/hooks/build-after.yml"
-
 deploy_finalize_after:
   - "{{ playbook_dir }}/deploy-hooks/finalize-after-install.yml"
   - "{{ playbook_dir }}/deploy-hooks/finalize-after.yml"
+
+# Custom shared children
+project_shared_children:
+  - path: web/app/uploads
+    src: uploads
+  - path: web/app/cache
+    src: cache
 
 # Values of raw_vars will be wrapped in `{% raw %}` to avoid templating problems if values include `{%` and `{{`.
 # Will recurse dicts/lists. `*` is wildcard for one or more dict keys, list indices, or strings. Example:
