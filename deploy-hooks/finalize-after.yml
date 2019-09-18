@@ -79,6 +79,11 @@
     args:
       chdir: "{{ deploy_helper.current_path }}"
 
+  - name: Clear Autoptimize cache
+    shell: wp cli has-command "autoptimize" && [ $? -eq 0 ] && wp autoptimize clear
+    args:
+      chdir: "{{ deploy_helper.current_path }}"
+
   - name: Re-activate disabled plugins on deploy
     command: wp plugin activate {{ item }}
     with_items:
