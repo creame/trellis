@@ -44,3 +44,33 @@
   location ~ ^/wp/wp-includes/js/tinymce/langs/.+\.php$ { deny all; }
   location ~ ^/wp/wp-includes/theme-compat/ { deny all; }
   {% endblock %}
+
+  {% block location_primary -%}
+  # Based on Cache Enabler nginx config (https://www.keycdn.com/support/wordpress-cache-enabler-plugin#nginx)
+  set $cache_uri $request_uri;
+
+  # bypass cache if POST requests or URLs with a query string
+  if ($request_method = POST) {
+    set $cache_uri 'nocache';
+  }
+
+  # bypass cache if GET queries
+  if ($query_string != "") {
+    set $cache_uri 'nocache';
+  }
+
+  # bypass cache if URLs containing the following strings
+  if ($request_uri ~* "{{ item.value.cache.skip_cache_uri | default(nginx_skip_cache_uri) }}") {
+    set $cache_uri 'nocache';
+  }
+
+  # bypass cache if the cookies containing the following strings
+  if ($http_cookie ~* "{{ item.value.cache.skip_cache_cookie | default(nginx_skip_cache_cookie) }}") {
+    set $cache_uri 'nocache';
+  }
+
+  location / {
+    gzip_static on;
+    try_files '/app/cache/cache-enabler/${http_host}${cache_uri}index.html' $uri $uri/ /index.php?$args;
+  }
+  {% endblock %}

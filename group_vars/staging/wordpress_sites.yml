@@ -18,5 +18,5 @@ wordpress_sites:
       enabled: true
       provider: letsencrypt
     cache:
-      enabled: true
+      enabled: false
     woocommerce: false
