@@ -17,6 +17,7 @@
     access_log off;
     add_header Pragma public;
     add_header Cache-Control "public";
+    add_header Vary Accept;
 
     try_files $path$webp_ext $path$file_ext =404;
   }
