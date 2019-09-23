@@ -62,10 +62,12 @@
     user: "{{ web_user }}"
     job: >
       cd {{ www_root }}/{{ item.key }}/{{ item.value.current_path | default('current') }}/web/app/uploads &&
-      find -type f -name "*.jpg" -mtime -1 -daystart -exec jpegoptim -qs {} \; &&
-      find -type f -name "*.jpg" -mtime -1 -daystart -exec sh -c 'cwebp -quiet -q 80 $1 -o "${1%.jpg}.webp"' _ {} \; &&
-      find -type f -name "*.png" -mtime -1 -daystart -exec optipng  -quiet -o4 -strip all {} \; &&
-      find -type f -name "*.png" -mtime -1 -daystart -exec sh -c 'cwebp -quiet -lossless $1 -o "${1%.png}.webp"' _ {} \;
+      find -type f -iname "*.jpg"  -mtime -1 -daystart -exec jpegoptim -qsp {} \; &&
+      find -type f -iname "*.jpeg" -mtime -1 -daystart -exec jpegoptim -qsp {} \; &&
+      find -type f -iname "*.jpg"  -mtime -1 -daystart -exec sh -c 'cwebp -quiet -q 80 $1 -o "${1%.jpg}.webp"' _ {} \; &&
+      find -type f -iname "*.jpeg" -mtime -1 -daystart -exec sh -c 'cwebp -quiet -q 80 $1 -o "${1%.jpeg}.webp"' _ {} \; &&
+      find -type f -iname "*.png"  -mtime -1 -daystart -exec optipng -quiet -o5 -preserve -strip all {} \; &&
+      find -type f -iname "*.png"  -mtime -1 -daystart -exec sh -c 'cwebp -quiet -lossless $1 -o "${1%.png}.webp"' _ {} \;
     cron_file: "wordpress-images-{{ item.key | replace('.', '_') }}"
   with_dict: "{{ wordpress_sites }}"
   when: image_optimize | default(false)

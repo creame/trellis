@@ -11,7 +11,7 @@
 
   {% if image_optimize | default(false) -%}
   # Try to server WebP images (if exists)
-  location ~* "^(?<path>.+)\.(png|jpg)$" {
+  location ~* "^(?<path>.+)\.(png|jpe?g)$" {
     expires max;
     log_not_found off;
     access_log off;
