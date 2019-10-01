@@ -38,7 +38,7 @@
     when: project.update_db_on_deploy | default(update_db_on_deploy) and project.woocommerce | default(false)
 
   - name: Update Elementor database
-    shell: wp cli has-command "elementor" && [ $? -eq 0 ] && wp elementor update db
+    shell: wp cli has-command "elementor" && [ $? -eq 0 ] && wp elementor update db || cd .
     args:
       chdir: "{{ deploy_helper.current_path }}"
     when: project.update_db_on_deploy | default(update_db_on_deploy)
@@ -80,7 +80,7 @@
       chdir: "{{ deploy_helper.current_path }}"
 
   - name: Clear Autoptimize cache
-    shell: wp cli has-command "autoptimize" && [ $? -eq 0 ] && wp autoptimize clear
+    shell: wp cli has-command "autoptimize" && [ $? -eq 0 ] && wp autoptimize clear || cd .
     args:
       chdir: "{{ deploy_helper.current_path }}"
 
