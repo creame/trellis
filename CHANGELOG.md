@@ -1,3 +1,15 @@
+### HEAD
+* Ansible 2.8.x support ([#1103](https://github.com/roots/trellis/pull/1103))
+* Bump galaxy dependency versions ([#1105](https://github.com/roots/trellis/pull/1105))
+* Fix issues with Vagrant ansible_local provisioner ([#1104](https://github.com/roots/trellis/pull/1104))
+* Bump ansible requirement to 2.7.12([#1102](https://github.com/roots/trellis/pull/1102))
+
+### 1.1.0: September 1st, 2019
+* Update swapfile role to v2.0.22 ([#1101](https://github.com/roots/trellis/pull/1101))
+* Add pip `requirements.txt` and rename `requirements.yml` to `galaxy.yml` ([#1100](https://github.com/roots/trellis/pull/1100))
+* Update apt packages before checking essentials task ([#1086](https://github.com/roots/trellis/pull/1086))
+* Setup composer HTTP basic authentication for multiple repositories ([#1091](https://github.com/roots/trellis/pull/1091))
+
 ### 1.0.3: April 30th, 2019
 * Prevent direct access for `.blade.php` files ([#1075](https://github.com/roots/trellis/pull/1075))
 * Show custom error message if external IP resolution fails ([#1078](https://github.com/roots/trellis/pull/1078))
