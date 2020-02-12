@@ -48,8 +48,8 @@
     args:
       chdir: "{{ deploy_helper.current_path }}"
 
-  - name: Install plugins and themes language es_ES
-    shell: wp language {{ item }} list --all --fields={{ item }},language | grep es_ES | cut -f 1 | xargs -I % wp language {{ item }} install % es_ES
+  - name: Install plugins and themes languages
+    command: wp language {{ item }} update --all
     with_items:
       - plugin
       - theme
@@ -80,17 +80,17 @@
       chdir: "{{ deploy_helper.current_path }}"
 
   - name: Clear Autoptimize cache
-    shell: wp cli has-command "autoptimize" && [ $? -eq 0 ] && wp autoptimize clear || cd .
+    shell: wp cli has-command "autoptimize" && [ $? -eq 0 ] && wp autoptimize clear --quiet || cd .
     args:
       chdir: "{{ deploy_helper.current_path }}"
 
-  - name: Re-activate disabled plugins on deploy
-    command: wp plugin activate {{ item }}
-    with_items:
-      - classic-editor
-      # - duplicate-post
-    args:
-      chdir: "{{ deploy_helper.current_path }}"
+  # - name: Re-activate disabled plugins on deploy
+  #   command: wp plugin activate {{ item }}
+  #   with_items:
+  #     - classic-editor
+  #     # - duplicate-post
+  #   args:
+  #     chdir: "{{ deploy_helper.current_path }}"
 
   when: wp_installed.rc == 0
 
