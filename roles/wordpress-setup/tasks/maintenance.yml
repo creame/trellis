@@ -49,8 +49,20 @@
     job: >
       cd {{ www_root }}/{{ item.key }}/{{ item.value.current_path | default('current') }} &&
       wp core update --minor &&
-      wp core update-db &&
-      wp core language update
+      wp core update-db
+    cron_file: "wordpress-{{ item.key | replace('.', '_') }}"
+  with_dict: "{{ wordpress_sites }}"
+
+- name: Setup WP languages updates cron
+  cron:
+    name: "{{ item.key }} WordPress minor updates cron"
+    hour: "4"
+    minute: "25"
+    user: "{{ web_user }}"
+    job: >
+      cd {{ www_root }}/{{ item.key }}/{{ item.value.current_path | default('current') }} &&
+      wp language core update &&
+      wp language plugin update --all
     cron_file: "wordpress-{{ item.key | replace('.', '_') }}"
   with_dict: "{{ wordpress_sites }}"
 
