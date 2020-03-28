@@ -43,16 +43,17 @@
       chdir: "{{ deploy_helper.current_path }}"
     when: project.update_db_on_deploy | default(update_db_on_deploy)
 
-  - name: Install core language es_ES
-    command: wp language core install es_ES
+  - name: Install core languages
+    command: wp language core install {{ item }}
+    with_items:
+      - es_ES
     args:
       chdir: "{{ deploy_helper.current_path }}"
 
-  - name: Install plugins and themes languages
-    command: wp language {{ item }} update --all
+  - name: Install plugins languages
+    command: wp language plugin install {{ item }} --all
     with_items:
-      - plugin
-      - theme
+      - es_ES
     args:
       chdir: "{{ deploy_helper.current_path }}"
 
@@ -78,9 +79,15 @@
       - activate
     args:
       chdir: "{{ deploy_helper.current_path }}"
+    when: env == "production"
 
   - name: Clear Autoptimize cache
     shell: wp cli has-command "autoptimize" && [ $? -eq 0 ] && wp autoptimize clear --quiet || cd .
+    args:
+      chdir: "{{ deploy_helper.current_path }}"
+
+  - name: Clear Cache Enabler cache
+    shell: wp cli has-command "cache-enabler" && [ $? -eq 0 ] && wp cache-enabler clear --quiet || cd .
     args:
       chdir: "{{ deploy_helper.current_path }}"
 
