@@ -19,8 +19,8 @@ nginx_wordpress_site_conf: nginx-includes/wordpress-site.conf.child
 nginx_skip_cache_cookie: comment_author|wordpress_[a-f0-9]+|wp-postpass|wordpress_no_cache|wordpress_logged_in|woocommerce_[a-z0-9_]+
 php_memory_limit: 256M
 php_extensions_custom:
-  php7.3-imagick: "{{ apt_package_state }}"
-  # php7.3-soap: "{{ apt_package_state }}"
+  php7.4-imagick: "{{ apt_package_state }}"
+  # php7.4-soap: "{{ apt_package_state }}"
 wp_cli_packages:
   - wp-cli/doctor-command
   - wp-cli/profile-command
