@@ -51,7 +51,7 @@
       chdir: "{{ deploy_helper.current_path }}"
 
   - name: Install plugins languages
-    command: wp language plugin install {{ item }} --all
+    command: wp language plugin install --all {{ item }}
     with_items:
       - es_ES
     args:
