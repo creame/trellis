@@ -43,9 +43,9 @@
   become: yes
   roles:
   - role: unattended
-    unattended_mail: '{{ mail_admin }}'
+    unattended_mail: "{{ mail_admin }}"
     unattended_mail_only_on_error: true
     unattended_automatic_reboot: true
-    unattended_automatic_reboot_time: '05:{{ 60 | random }}'
+    unattended_automatic_reboot_time: "05:{{ 60 | random }}"
     unattended_remove_unused_dependencies: true
     tags: [upgrades]
