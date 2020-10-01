@@ -35,6 +35,10 @@ update_wp_theme_paths: false
 # Enable image optimization cron task and serve webp format
 image_optimize: true
 
+# WordPress languages (others than default en_US)
+project_languages:
+  - es_ES
+
 # Custom deploy hooks
 deploy_initialize_after:
   - "{{ playbook_dir }}/deploy-hooks/initialize-after.yml"

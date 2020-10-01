@@ -45,15 +45,19 @@
 
   - name: Install core languages
     command: wp language core install {{ item }}
-    with_items:
-      - es_ES
+    with_items: "{{ project.languages | default(project_languages) }}"
+    args:
+      chdir: "{{ deploy_helper.current_path }}"
+
+  - name: Install theme languages
+    command: wp language theme install --all {{ item }}
+    with_items: "{{ project.languages | default(project_languages) }}"
     args:
       chdir: "{{ deploy_helper.current_path }}"
 
   - name: Install plugins languages
     command: wp language plugin install --all {{ item }}
-    with_items:
-      - es_ES
+    with_items: "{{ project.languages | default(project_languages) }}"
     args:
       chdir: "{{ deploy_helper.current_path }}"
 
