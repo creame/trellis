@@ -13,6 +13,9 @@ ntp_timezone: Etc/UTC
 ntp_manage_config: true
 www_root: /srv/www
 
+letsencrypt_contact_emails:
+  - sistemas@crea.me
+
 # Nginx
 nginx_conf: nginx-includes/nginx.conf.child
 nginx_wordpress_site_conf: nginx-includes/wordpress-site.conf.child
