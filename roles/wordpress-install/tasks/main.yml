@@ -21,15 +21,6 @@
   no_log: true
   with_dict: "{{ wordpress_sites }}"
 
-- name: Setup packages.crea.me authentication
-  composer:
-    command: config
-    arguments: --auth http-basic.packages.crea.me creame {{ vault_creame_password }}
-    working_dir: "{{ www_root }}/{{ item.key }}/{{ item.value.current_path | default('current') }}/"
-  no_log: true
-  when: vault_creame_password is defined
-  with_dict: "{{ wordpress_sites }}"
-
 - name: Install Dependencies with Composer
   composer:
     no_dev: no
