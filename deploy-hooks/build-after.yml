@@ -1,7 +1,0 @@
----
-- name: Setup packages.crea.me authentication
-  composer:
-    global_command: yes
-    command: config
-    arguments: http-basic.packages.crea.me creame {{ vault_creame_password }}
-  when: vault_creame_password is defined
