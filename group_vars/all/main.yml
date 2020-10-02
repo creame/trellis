@@ -14,7 +14,7 @@ ntp_manage_config: true
 www_root: /srv/www
 
 letsencrypt_contact_emails:
-  - sistemas@crea.me
+  - "{{ mail_admin }}"
 
 # Nginx
 nginx_conf: nginx-includes/nginx.conf.child
