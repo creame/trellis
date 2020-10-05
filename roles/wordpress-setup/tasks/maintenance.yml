@@ -12,7 +12,7 @@
   cron:
     name: "{{ item.key }} Woocommerce maintenance cron"
     hour: "4"
-    minute: "1"
+    minute: "0"
     user: "{{ web_user }}"
     job: >
       cd {{ www_root }}/{{ item.key }}/{{ item.value.current_path | default('current') }} &&
@@ -26,6 +26,19 @@
   with_dict: "{{ wordpress_sites }}"
   when: item.value.woocommerce | default(false)
 
+- name: Setup WP DB optimize cron
+  cron:
+    name: "{{ item.key }} WordPress BD optimize cron"
+    hour: "4"
+    minute: "10"
+    user: "{{ web_user }}"
+    job: >
+      cd {{ www_root }}/{{ item.key }}/{{ item.value.current_path | default('current') }} &&
+      wp transient delete --expired --quiet &&
+      wp db optimize > /dev/null
+    cron_file: "wordpress-{{ item.key | replace('.', '_') }}"
+  with_dict: "{{ wordpress_sites }}"
+
 - name: Setup WP DB backup cron
   cron:
     name: "{{ item.key }} WordPress BD backup cron"
@@ -34,8 +47,6 @@
     user: "{{ web_user }}"
     job: >
       cd {{ www_root }}/{{ item.key }}/{{ item.value.current_path | default('current') }} &&
-      wp transient delete --expired &&
-      wp db optimize &&
       wp db export - | gzip > {{ www_root }}/{{ item.key }}/backups/backup-`date +\%Y\%m\%dT\%H\%M\%S`.sql.gz
     cron_file: "wordpress-{{ item.key | replace('.', '_') }}"
   with_dict: "{{ wordpress_sites }}"
@@ -48,8 +59,8 @@
     user: "{{ web_user }}"
     job: >
       cd {{ www_root }}/{{ item.key }}/{{ item.value.current_path | default('current') }} &&
-      wp core update --minor &&
-      wp core update-db
+      wp core update --minor --quiet &&
+      wp core update-db --quiet
     cron_file: "wordpress-{{ item.key | replace('.', '_') }}"
   with_dict: "{{ wordpress_sites }}"
 
@@ -61,8 +72,20 @@
     user: "{{ web_user }}"
     job: >
       cd {{ www_root }}/{{ item.key }}/{{ item.value.current_path | default('current') }} &&
-      wp language core update &&
-      wp language plugin update --all
+      wp language core update --quiet &&
+      wp language plugin update --all --quiet
+    cron_file: "wordpress-{{ item.key | replace('.', '_') }}"
+  with_dict: "{{ wordpress_sites }}"
+
+- name: Setup WP doctor cron
+  cron:
+    name: "{{ item.key }} WordPress doctor"
+    hour: "4"
+    minute: "30"
+    user: "{{ web_user }}"
+    job: >
+      cd {{ www_root }}/{{ item.key }}/{{ item.value.current_path | default('current') }} &&
+      wp doctor check autoload-options-size core-update core-verify-checksums cron-count cron-duplicates file-eval php-in-upload --spotlight --quiet
     cron_file: "wordpress-{{ item.key | replace('.', '_') }}"
   with_dict: "{{ wordpress_sites }}"
 
@@ -76,10 +99,10 @@
       cd {{ www_root }}/{{ item.key }}/{{ item.value.current_path | default('current') }}/web/app/uploads &&
       find -type f -iname "*.jpg"  -mtime -1 -daystart -exec jpegoptim -qsp {} \; &&
       find -type f -iname "*.jpeg" -mtime -1 -daystart -exec jpegoptim -qsp {} \; &&
+      find -type f -iname "*.png"  -mtime -1 -daystart -exec optipng -quiet -o5 -preserve -strip all {} \; &&
       find -type f -iname "*.jpg"  -mtime -1 -daystart -exec sh -c 'cwebp -quiet -q 80 $1 -o "${1%.jpg}.webp"' _ {} \; &&
       find -type f -iname "*.jpeg" -mtime -1 -daystart -exec sh -c 'cwebp -quiet -q 80 $1 -o "${1%.jpeg}.webp"' _ {} \; &&
-      find -type f -iname "*.png"  -mtime -1 -daystart -exec optipng -quiet -o5 -preserve -strip all {} \; &&
       find -type f -iname "*.png"  -mtime -1 -daystart -exec sh -c 'cwebp -quiet -lossless $1 -o "${1%.png}.webp"' _ {} \;
-    cron_file: "wordpress-images-{{ item.key | replace('.', '_') }}"
+    cron_file: "wordpress-{{ item.key | replace('.', '_') }}"
   with_dict: "{{ wordpress_sites }}"
   when: image_optimize | default(false)
