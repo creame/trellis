@@ -8,6 +8,13 @@
     state: directory
   with_dict: "{{ wordpress_sites }}"
 
+- name: Setup MAILTO on WP cron
+  cronvar:
+    name: MAILTO
+    value: "{{ item.value.cron_mailto | default(mail_admin) }}"
+    cron_file: "wordpress-{{ item.key | replace('.', '_') }}"
+  with_dict: "{{ wordpress_sites }}"
+
 - name: Setup WP Woocommerce maintenance cron
   cron:
     name: "{{ item.key }} Woocommerce maintenance cron"

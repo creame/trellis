@@ -1,0 +1,3 @@
+# {{ ansible_managed }}
+
+sed "s/From: root (Cron Daemon)/From: Cron Daemon <cron@{{ mail_hostname }}>/" | /usr/sbin/ssmtp $*

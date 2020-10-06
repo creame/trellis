@@ -13,3 +13,10 @@
     hour: "4"
     minute: "30"
     state: present
+
+- name: Setup MAILTO on cronjob for key generation
+  cronvar:
+    cron_file: letsencrypt-certificate-renewal
+    name: MAILTO
+    value: "{{ mail_admin }}"
+    state: present
