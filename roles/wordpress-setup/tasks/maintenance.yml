@@ -23,12 +23,12 @@
     user: "{{ web_user }}"
     job: >
       cd {{ www_root }}/{{ item.key }}/{{ item.value.current_path | default('current') }} &&
-      wp wc tool run clear_expired_transients --user=admin.creame &&
-      wp wc tool run delete_orphaned_variations --user=admin.creame &&
-      wp wc tool run clear_expired_download_permissions --user=admin.creame &&
-      wp wc tool run recount_terms --user=admin.creame &&
-      wp wc tool run add_order_indexes --user=admin.creame &&
-      wp wc tool run regenerate_product_lookup_tables --user=admin.creame
+      wp wc tool run verify_db_tables --user=admin.creame --quiet &&
+      wp wc tool run clear_expired_transients --user=admin.creame --quiet &&
+      wp wc tool run delete_orphaned_variations --user=admin.creame --quiet &&
+      wp wc tool run clear_expired_download_permissions --user=admin.creame --quiet &&
+      wp wc tool run recount_terms --user=admin.creame --quiet &&
+      wp wc tool run regenerate_product_lookup_tables --user=admin.creame --quiet
     cron_file: "wordpress-{{ item.key | replace('.', '_') }}"
   with_dict: "{{ wordpress_sites }}"
   when: item.value.woocommerce | default(false)
@@ -92,7 +92,7 @@
     user: "{{ web_user }}"
     job: >
       cd {{ www_root }}/{{ item.key }}/{{ item.value.current_path | default('current') }} &&
-      wp doctor check autoload-options-size core-update core-verify-checksums cron-count cron-duplicates file-eval php-in-upload --spotlight --quiet
+      wp doctor check autoload-options-size core-update core-verify-checksums cron-count cron-duplicates file-eval --spotlight --quiet
     cron_file: "wordpress-{{ item.key | replace('.', '_') }}"
   with_dict: "{{ wordpress_sites }}"
 
