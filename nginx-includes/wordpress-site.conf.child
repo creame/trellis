@@ -19,7 +19,7 @@
     add_header Cache-Control "public";
     add_header Vary Accept;
 
-    try_files $path$webp_ext $path$file_ext =404;
+    try_files $path$file_ext$webp_ext $path$webp_ext $path$file_ext =404;
   }
   {% endif -%}
 
