@@ -92,7 +92,7 @@
     user: "{{ web_user }}"
     job: >
       cd {{ www_root }}/{{ item.key }}/{{ item.value.current_path | default('current') }} &&
-      wp doctor check autoload-options-size core-update core-verify-checksums cron-count cron-duplicates file-eval --spotlight --quiet
+      wp doctor check autoload-options-size core-verify-checksums cron-count cron-duplicates file-eval --spotlight --quiet
     cron_file: "wordpress-{{ item.key | replace('.', '_') }}"
   with_dict: "{{ wordpress_sites }}"
 
