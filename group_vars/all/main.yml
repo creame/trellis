@@ -26,9 +26,9 @@ php_extensions_custom:
   # php7.4-soap: "{{ apt_package_state }}"
 
 # WP-Cli
-wp_cli_packages:
-  - wp-cli/doctor-command
-  - wp-cli/profile-command
+# wp_cli_packages:
+#   - wp-cli/doctor-command
+#   - wp-cli/profile-command
 
 # Disable wp option update releases path on deploy
 update_wp_theme_paths: false

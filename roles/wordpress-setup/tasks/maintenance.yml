@@ -84,7 +84,7 @@
     cron_file: "wordpress-{{ item.key | replace('.', '_') }}"
   with_dict: "{{ wordpress_sites }}"
 
-- name: Setup WP doctor cron
+- name: Setup Verify checksums cron
   cron:
     name: "{{ item.key }} WordPress doctor"
     hour: "4"
@@ -92,7 +92,7 @@
     user: "{{ web_user }}"
     job: >
       cd {{ www_root }}/{{ item.key }}/{{ item.value.current_path | default('current') }} &&
-      wp doctor check autoload-options-size core-verify-checksums cron-count cron-duplicates file-eval --spotlight --quiet
+      wp core verify-checksums --quiet
     cron_file: "wordpress-{{ item.key | replace('.', '_') }}"
   with_dict: "{{ wordpress_sites }}"
 
