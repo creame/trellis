@@ -9,7 +9,7 @@
   template:
     src: ssmtp.conf.j2
     dest: /etc/ssmtp/ssmtp.conf
-    mode: 0644
+    mode: '0644'
 
 - name: ssmtp revaliases configuration
   template:
@@ -20,4 +20,4 @@
   template:
     src: sendmail.j2
     dest: /usr/sbin/sendmail
-    mode: 0777
+    mode: '0777'
