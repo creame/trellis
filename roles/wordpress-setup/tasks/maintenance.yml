@@ -15,9 +15,9 @@
     cron_file: "wordpress-{{ item.key | replace('.', '_') }}"
   with_dict: "{{ wordpress_sites }}"
 
-- name: Setup WP Woocommerce maintenance cron
+- name: Setup WP WooCommerce maintenance cron
   cron:
-    name: "{{ item.key }} Woocommerce maintenance cron"
+    name: "{{ item.key }} WooCommerce maintenance"
     hour: "4"
     minute: "0"
     user: "{{ web_user }}"
@@ -35,7 +35,7 @@
 
 - name: Setup WP DB optimize cron
   cron:
-    name: "{{ item.key }} WordPress BD optimize cron"
+    name: "{{ item.key }} WordPress BD optimize"
     hour: "4"
     minute: "10"
     user: "{{ web_user }}"
@@ -48,7 +48,7 @@
 
 - name: Setup WP DB backup cron
   cron:
-    name: "{{ item.key }} WordPress BD backup cron"
+    name: "{{ item.key }} WordPress BD backup"
     hour: "4"
     minute: "15"
     user: "{{ web_user }}"
@@ -60,7 +60,7 @@
 
 - name: Setup WP security updates cron
   cron:
-    name: "{{ item.key }} WordPress minor updates cron"
+    name: "{{ item.key }} WordPress security updates"
     hour: "4"
     minute: "20"
     user: "{{ web_user }}"
@@ -73,7 +73,7 @@
 
 - name: Setup WP languages updates cron
   cron:
-    name: "{{ item.key }} WordPress minor updates cron"
+    name: "{{ item.key }} WordPress languages updates"
     hour: "4"
     minute: "25"
     user: "{{ web_user }}"
@@ -86,7 +86,7 @@
 
 - name: Setup Verify checksums cron
   cron:
-    name: "{{ item.key }} WordPress doctor"
+    name: "{{ item.key }} WordPress verify checksums"
     hour: "4"
     minute: "30"
     user: "{{ web_user }}"
@@ -98,7 +98,7 @@
 
 - name: Setup Image optimization cron
   cron:
-    name: "{{ item.key }} image optimization cron"
+    name: "{{ item.key }} image optimization"
     hour: "1"
     minute: "5"
     user: "{{ web_user }}"
@@ -113,7 +113,7 @@
 
 - name: Setup WebP conversion cron
   cron:
-    name: "{{ item.key }} WebP conversion cron"
+    name: "{{ item.key }} WebP conversion"
     hour: "2"
     minute: "5"
     user: "{{ web_user }}"
