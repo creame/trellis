@@ -95,14 +95,6 @@
     args:
       chdir: "{{ deploy_helper.current_path }}"
 
-  # - name: Re-activate disabled plugins on deploy
-  #   command: wp plugin activate {{ item }}
-  #   with_items:
-  #     - classic-editor
-  #     # - duplicate-post
-  #   args:
-  #     chdir: "{{ deploy_helper.current_path }}"
-
   when: wp_installed.rc == 0
 
 - name: Reload php-fpm
