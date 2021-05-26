@@ -59,8 +59,8 @@ if [[ ! -e $HOSTS_FILE ]]; then
   echo
   exit 1
 else
-  echo "${BLUE}Doing $ACTION for '$SITE' <$ENV>...${RESET}"
   echo
+  echo "${BLUE}Doing $ACTION for '$SITE' on <$ENV>...${RESET}"
 fi
 
 if [ $ACTION == "provision" ]; then
