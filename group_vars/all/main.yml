@@ -7,7 +7,6 @@ apt_packages_custom:
   optipng: "{{ apt_package_state }}"
   webp: "{{ apt_package_state }}"
 composer_keep_updated: true
-php_version: "7.4"
 ntp_timezone: Etc/UTC
 ntp_manage_config: true
 www_root: /srv/www
@@ -21,6 +20,7 @@ nginx_wordpress_site_conf: nginx-includes/wordpress-site.conf.child
 nginx_skip_cache_cookie: comment_author|wordpress_[a-f0-9]+|wp-postpass|wordpress_no_cache|wordpress_logged_in|woocommerce_[a-z0-9_]+
 
 # PHP
+php_version: "7.4"
 php_memory_limit: 256M
 php_extensions_custom:
   php7.4-imagick: "{{ apt_package_state }}"
