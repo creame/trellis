@@ -54,30 +54,69 @@
 
   {% block location_primary -%}
   # Based on Cache Enabler nginx config (https://www.keycdn.com/support/wordpress-cache-enabler-plugin#nginx)
-  set $cache_dir "/app/cache/cache-enabler";
-  set $cache_uri $request_uri;
 
-  # Bypass cache if not GET method
-  if ($request_method != GET) {
-    set $cache_uri "nocache";
+  # cache directory
+  set $ce_cache_dir "/app/cache/cache-enabler";
+
+  # default cache keys
+  set $ce_cache_key_scheme      "http-";
+  set $ce_cache_key_device      "";
+  set $ce_cache_key_compression "";
+
+  # scheme cache key
+  if ($scheme = https) {
+    set $ce_cache_key_scheme "https-";
   }
 
-  # Bypass cache for excluded queries
-  if ($query_string ~ ^(?!(fbclid|ref|mc_(cid|eid)|utm_(source|medium|campaign|term|content|expid)|gclid|fb_(action_ids|action_types|source)|age-verified|usqp|cn-reloaded|_ga|_ke)).+$) {
-    set $cache_uri "nocache";
-  }
+  # device cache key
+  # if ($http_user_agent ~ "(Mobile|Android|Silk/|Kindle|BlackBerry|Opera Mini|Opera Mobi)") {
+  #    set $ce_cache_key_device "-mobile";
+  # }
 
-  # Bypass cache for excluded URLs
-  if ($request_uri ~* "{{ item.value.cache.skip_cache_uri | default(nginx_skip_cache_uri) }}") {
-    set $cache_uri "nocache";
-  }
+  # compression cache key
+  # if ($http_accept_encoding ~ gzip) {
+  #   set $ce_cache_key_compression ".gz";
+  # }
 
-  # Bypass cache for excluded cookies
-  if ($http_cookie ~* "{{ item.value.cache.skip_cache_cookie | default(nginx_skip_cache_cookie) }}") {
-    set $cache_uri "nocache";
-  }
+  # get cache file
+  set $ce_cache_file_dir  ${ce_cache_dir}/${http_host}${request_uri};
+  set $ce_cache_file_name ${ce_cache_key_scheme}index${ce_cache_key_device}.html${ce_cache_key_compression};
+  set $ce_cache_file      ${ce_cache_file_dir}/${ce_cache_file_name};
 
   location / {
-    try_files $cache_dir/$http_host$cache_uri$scheme-index.html $uri $uri/ /index.php?$args;
+    error_page 405 = @fallback;
+    recursive_error_pages on;
+
+    # check request method
+    if ($request_method != GET) {
+      return 405;
+    }
+
+    # check permalink structure has trailing slash
+    if ($request_uri !~ /[^\./\?]+(\?.*)?$) {
+      return 405;
+    }
+
+    # check excluded query strings
+    if ($query_string ~ ^(?!(fbclid|ref|mc_(cid|eid)|utm_(source|medium|campaign|term|content|expid)|gclid|fb_(action_ids|action_types|source)|age-verified|usqp|cn-reloaded|_ga|_ke)).+$) {
+      return 405;
+    }
+
+    # check excluded URLs
+    if ($request_uri ~* "{{ item.value.cache.skip_cache_uri | default(nginx_skip_cache_uri) }}") {
+      return 405;
+    }
+
+    # check excluded cookies
+    if ($http_cookie ~* "{{ item.value.cache.skip_cache_cookie | default(nginx_skip_cache_cookie) }}") {
+      return 405;
+    }
+
+    # deliver cache file if it exists
+    try_files $ce_cache_file @fallback;
+  }
+
+  location @fallback {
+    try_files $uri $uri/ /index.php?$args;
   }
   {% endblock %}
