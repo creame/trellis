@@ -20,7 +20,7 @@
 
   {% if image_optimize | default(false) -%}
   # Try to server WebP images (if exists)
-  set $webp_ext ""
+  set $webp_ext "";
 
   if ( $http_accept ~ image/webp ) {
     set $webp_ext ".webp";
