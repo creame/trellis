@@ -9,20 +9,6 @@
   {% block location_uploads_php -%}
   {{ super() }}
 
-  {% if image_optimize | default(false) -%}
-  # Try to server WebP images (if exists)
-  location ~* "^(?<path>.+)\.(png|jpe?g)$" {
-    expires max;
-    log_not_found off;
-    access_log off;
-    add_header Pragma public;
-    add_header Cache-Control "public";
-    add_header Vary Accept;
-
-    try_files $path$file_ext$webp_ext $path$webp_ext $path$file_ext =404;
-  }
-  {% endif -%}
-
   # Set max cache for static files
   location ~* .(?:ogg|ogv|svg|svgz|eot|otf|woff2?|mp4|ttf|css|rss|atom|js|jpg|jpeg|gif|png|webp|ico|zip|tgz|gz|rar|bz2|doc|xls|exe|ppt|tar|mid|midi|wav|bmp|rtf|cur)$ {
     expires max;
@@ -31,6 +17,21 @@
     add_header Pragma public;
     add_header Cache-Control "public";
   }
+
+  {% if image_optimize | default(false) -%}
+  # Try to server WebP images (if exists)
+  set $webp_ext ""
+
+  if ( $http_accept ~ image/webp ) {
+    set $webp_ext ".webp";
+  }
+
+  location ~* "^(?<path>.+)\.(png|jpe?g)$" {
+    add_header Vary Accept;
+
+    try_files $uri$webp_ext $path$webp_ext $uri =404;
+  }
+  {% endif -%}
 
   # Disable XML-RPC
   location ~* xmlrpc\.php$ { return 444; }
