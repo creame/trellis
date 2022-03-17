@@ -19,10 +19,10 @@ nginx_wordpress_site_conf: nginx-includes/wordpress-site.conf.child
 nginx_skip_cache_cookie: comment_author|wordpress_[a-f0-9]+|wp-postpass|wordpress_no_cache|wordpress_logged_in|woocommerce_[a-z0-9_]+
 
 # PHP
-php_version: "7.4"
+php_version: "8.0"
 php_memory_limit: 256M
 php_extensions_custom:
-  php7.4-soap: "{{ apt_package_state }}"
+  php8.0-soap: "{{ apt_package_state }}"
 
 # WP-Cli
 # wp_cli_packages:
