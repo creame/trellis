@@ -15,6 +15,7 @@
   template:
     src: revaliases.j2
     dest: /etc/ssmtp/revaliases
+    mode: '0644'
 
 - name: sendmail override for CRON emails
   template:
