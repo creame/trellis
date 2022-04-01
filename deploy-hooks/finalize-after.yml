@@ -38,7 +38,13 @@
     when: project.update_db_on_deploy | default(update_db_on_deploy) and project.woocommerce | default(false)
 
   - name: Update Elementor database
-    shell: wp cli has-command "elementor" && [ $? -eq 0 ] && wp elementor update db || cd .
+    shell: wp cli has-command "wp elementor update db" && [ $? -eq 0 ] && wp elementor update db || cd .
+    args:
+      chdir: "{{ deploy_helper.current_path }}"
+    when: project.update_db_on_deploy | default(update_db_on_deploy)
+
+  - name: Update Elementor Pro database
+    shell: wp cli has-command "wp elementor-pro update db" && [ $? -eq 0 ] && wp elementor-pro update db || cd .
     args:
       chdir: "{{ deploy_helper.current_path }}"
     when: project.update_db_on_deploy | default(update_db_on_deploy)
