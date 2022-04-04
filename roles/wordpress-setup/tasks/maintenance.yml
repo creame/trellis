@@ -22,13 +22,13 @@
     minute: "0"
     user: "{{ web_user }}"
     job: >
-      cd {{ www_root }}/{{ item.key }}/{{ item.value.current_path | default('current') }} &&
-      wp wc tool run verify_db_tables --user=admin.creame --quiet &&
-      wp wc tool run clear_expired_transients --user=admin.creame --quiet &&
-      wp wc tool run delete_orphaned_variations --user=admin.creame --quiet &&
-      wp wc tool run clear_expired_download_permissions --user=admin.creame --quiet &&
-      wp wc tool run recount_terms --user=admin.creame --quiet &&
-      wp wc tool run regenerate_product_lookup_tables --user=admin.creame --quiet
+      cd {{ www_root }}/{{ item.key }}/{{ item.value.current_path | default('current') }}
+      && wp wc tool run verify_db_tables --user=admin.creame --quiet
+      && wp wc tool run clear_expired_transients --user=admin.creame --quiet
+      && wp wc tool run delete_orphaned_variations --user=admin.creame --quiet
+      && wp wc tool run clear_expired_download_permissions --user=admin.creame --quiet
+      && wp wc tool run recount_terms --user=admin.creame --quiet
+      && wp wc tool run regenerate_product_lookup_tables --user=admin.creame --quiet
     cron_file: "wordpress-{{ item.key | replace('.', '_') }}"
   with_dict: "{{ wordpress_sites }}"
   when: item.value.woocommerce | default(false)
@@ -40,9 +40,9 @@
     minute: "10"
     user: "{{ web_user }}"
     job: >
-      cd {{ www_root }}/{{ item.key }}/{{ item.value.current_path | default('current') }} &&
-      wp transient delete --expired --quiet &&
-      wp db optimize > /dev/null
+      cd {{ www_root }}/{{ item.key }}/{{ item.value.current_path | default('current') }}
+      && wp transient delete --expired --quiet
+      && wp db optimize > /dev/null
     cron_file: "wordpress-{{ item.key | replace('.', '_') }}"
   with_dict: "{{ wordpress_sites }}"
 
@@ -53,8 +53,8 @@
     minute: "15"
     user: "{{ web_user }}"
     job: >
-      cd {{ www_root }}/{{ item.key }}/{{ item.value.current_path | default('current') }} &&
-      wp db export - | gzip > {{ www_root }}/{{ item.key }}/backups/backup-`date +\%Y\%m\%dT\%H\%M\%S`.sql.gz
+      cd {{ www_root }}/{{ item.key }}/{{ item.value.current_path | default('current') }}
+      && wp db export - | gzip > {{ www_root }}/{{ item.key }}/backups/backup-`date +\%Y\%m\%dT\%H\%M\%S`.sql.gz
     cron_file: "wordpress-{{ item.key | replace('.', '_') }}"
   with_dict: "{{ wordpress_sites }}"
 
@@ -65,9 +65,9 @@
     minute: "20"
     user: "{{ web_user }}"
     job: >
-      cd {{ www_root }}/{{ item.key }}/{{ item.value.current_path | default('current') }} &&
-      wp core update --minor --quiet &&
-      wp core update-db --quiet
+      cd {{ www_root }}/{{ item.key }}/{{ item.value.current_path | default('current') }}
+      && wp core update --minor --quiet
+      && wp core update-db --quiet
     cron_file: "wordpress-{{ item.key | replace('.', '_') }}"
   with_dict: "{{ wordpress_sites }}"
 
@@ -78,9 +78,9 @@
     minute: "25"
     user: "{{ web_user }}"
     job: >
-      cd {{ www_root }}/{{ item.key }}/{{ item.value.current_path | default('current') }} &&
-      wp language core update >/dev/null 2>&1 &&
-      wp language plugin update --all >/dev/null 2>&1
+      cd {{ www_root }}/{{ item.key }}/{{ item.value.current_path | default('current') }}
+      && wp language core update >/dev/null 2>&1
+      && wp language plugin update --all >/dev/null 2>&1
     cron_file: "wordpress-{{ item.key | replace('.', '_') }}"
   with_dict: "{{ wordpress_sites }}"
 
@@ -91,8 +91,8 @@
     minute: "30"
     user: "{{ web_user }}"
     job: >
-      cd {{ www_root }}/{{ item.key }}/{{ item.value.current_path | default('current') }} &&
-      wp core verify-checksums --quiet
+      cd {{ www_root }}/{{ item.key }}/{{ item.value.current_path | default('current') }}
+      && wp core verify-checksums --quiet
     cron_file: "wordpress-{{ item.key | replace('.', '_') }}"
   with_dict: "{{ wordpress_sites }}"
 
@@ -103,10 +103,10 @@
     minute: "5"
     user: "{{ web_user }}"
     job: >
-      cd {{ www_root }}/{{ item.key }}/{{ item.value.current_path | default('current') }}/web/app/uploads &&
-      find -type f -iname "*.jpg"  -mtime -1 -daystart -exec jpegoptim -qsp {} \; &&
-      find -type f -iname "*.jpeg" -mtime -1 -daystart -exec jpegoptim -qsp {} \; &&
-      find -type f -iname "*.png"  -mtime -1 -daystart -exec optipng -quiet -o5 -preserve -strip all {} \;
+      cd {{ www_root }}/{{ item.key }}/{{ item.value.current_path | default('current') }}/web/app/uploads
+      && find -type f -iname "*.jpg"  -mtime -1 -daystart -exec jpegoptim -qsp {} \;
+      && find -type f -iname "*.jpeg" -mtime -1 -daystart -exec jpegoptim -qsp {} \;
+      && find -type f -iname "*.png"  -mtime -1 -daystart -exec optipng -quiet -o5 -preserve -strip all {} \;
     cron_file: "wordpress-{{ item.key | replace('.', '_') }}"
   with_dict: "{{ wordpress_sites }}"
   when: image_optimize | default(false)
@@ -118,10 +118,10 @@
     minute: "5"
     user: "{{ web_user }}"
     job: >
-      cd {{ www_root }}/{{ item.key }}/{{ item.value.current_path | default('current') }}/web/app/uploads &&
-      find -type f -iname "*.jpg"  -mtime -1 -daystart -exec sh -c 'cwebp -quiet -q 80 $1 -o "$1.webp"' _ {} \; &&
-      find -type f -iname "*.jpeg" -mtime -1 -daystart -exec sh -c 'cwebp -quiet -q 80 $1 -o "$1.webp"' _ {} \; &&
-      find -type f -iname "*.png"  -mtime -1 -daystart -exec sh -c 'cwebp -quiet -lossless $1 -o "$1.webp"' _ {} \;
+      cd {{ www_root }}/{{ item.key }}/{{ item.value.current_path | default('current') }}/web/app/uploads
+      && find -type f -iname "*.jpg"  -mtime -1 -daystart -exec sh -c 'cwebp -quiet -q 80 $1 -o "$1.webp"' _ {} \;
+      && find -type f -iname "*.jpeg" -mtime -1 -daystart -exec sh -c 'cwebp -quiet -q 80 $1 -o "$1.webp"' _ {} \;
+      && find -type f -iname "*.png"  -mtime -1 -daystart -exec sh -c 'cwebp -quiet -lossless $1 -o "$1.webp"' _ {} \;
     cron_file: "wordpress-{{ item.key | replace('.', '_') }}"
   with_dict: "{{ wordpress_sites }}"
   when: image_optimize | default(false)
