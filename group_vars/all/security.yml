@@ -17,12 +17,12 @@ ferm_input_list:
 fail2ban_services_custom:
   - name: wordpress_xmlrpc
     filter: wordpress-xmlrpc
-    enabled: "false"
+    enabled: "true"
     port: http,https
     logpath: "{{ www_root }}/**/logs/access.log"
   - name: wordpress_wp_login
     filter: wordpress-wp-login
-    enabled: "false"
+    enabled: "true"
     port: http,https
     logpath: "{{ www_root }}/**/logs/access.log"
 
