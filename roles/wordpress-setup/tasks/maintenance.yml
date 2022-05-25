@@ -54,7 +54,8 @@
     user: "{{ web_user }}"
     job: >
       cd {{ www_root }}/{{ item.key }}/{{ item.value.current_path | default('current') }}
-      && wp db export - | gzip > {{ www_root }}/{{ item.key }}/backups/backup-`date +\%Y\%m\%dT\%H\%M\%S`.sql.gz
+      && wp db export {{ www_root }}/{{ item.key }}/backups/backup-`date +\%Y\%m\%dT041500`.sql --quiet
+      && gzip -q {{ www_root }}/{{ item.key }}/backups/backup-`date +\%Y\%m\%dT041500`.sql
     cron_file: "wordpress-{{ item.key | replace('.', '_') }}"
   with_dict: "{{ wordpress_sites }}"
 
