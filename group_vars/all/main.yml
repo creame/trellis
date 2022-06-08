@@ -43,7 +43,6 @@ project_languages:
 deploy_initialize_after:
   - "{{ playbook_dir }}/deploy-hooks/initialize-after.yml"
 deploy_finalize_after:
-  - "{{ playbook_dir }}/deploy-hooks/finalize-after-install.yml"
   - "{{ playbook_dir }}/deploy-hooks/finalize-after.yml"
 
 # Custom shared children
