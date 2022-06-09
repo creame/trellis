@@ -18,6 +18,7 @@
       set_fact:
         initialize_after_wp_installed: "{{ initialize_after_wp_installed_singlesite }}"
   when:
+    - initialize_after_current_path.stat.exists
     - not project.multisite.enabled | default(false)
 
 - name: WordPress Installed (multisite)?
@@ -43,6 +44,7 @@
       set_fact:
         initialize_after_wp_installed: "{{ initialize_after_wp_installed_multisite }}"
   when:
+    - initialize_after_current_path.stat.exists
     - project.multisite.enabled | default(false)
 
 - name: Backup WordPress database before new deploy
