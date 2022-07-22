@@ -10,6 +10,7 @@ composer_keep_updated: true
 ntp_timezone: Etc/UTC
 ntp_manage_config: true
 www_root: /srv/www
+max_journal_size: 512M
 
 letsencrypt_contact_emails:
   - "{{ mail_admin }}"
