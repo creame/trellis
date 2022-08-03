@@ -7,13 +7,15 @@
     project: "{{ wordpress_sites[site] }}"
     project_current: "{{ www_root }}/{{ site }}/current"
     project_local_path: "{{ (lookup('env', 'USER') == 'vagrant') | ternary(project_current, project.local_path) }}"
-    sync_file: "db-sync.sql.gz"
-    backup_file: "db-backup-{{ ansible_date_time.iso8601_basic_short }}.sql.gz"
+    sync_file: "db-sync.sql"
+    backup_file: "db-backup-{{ ansible_date_time.iso8601_basic_short }}.sql"
     dev_host: "{{ groups['development'] | first }}"
     domain_dev: "{{ hostvars[dev_host].wordpress_sites[site].site_hosts.0.canonical }}"
     domain_env: "{{ project.site_hosts.0.canonical }}"
     url_dev: "{{ hostvars[dev_host].wordpress_sites[site].ssl.enabled | ternary('https', 'http') }}://{{ domain_dev }}"
     url_env: "{{ project.ssl.enabled | ternary('https', 'http') }}://{{ domain_env }}"
+    skip_guids_option: "--skip-columns=guid"
+    skip_guids_column: "{{ skip_guids | default('false') }}"
 
   tasks:
     - name: Abort if environment variable is equal to development
@@ -21,35 +23,40 @@
         msg: "ERROR: development is not a valid environment for this mode (you can't push/pull from development to development)."
       when: env == "development"
 
-    # PULL database
-    - block:
-      - name: PULL > Export {{ env }} database
-        shell: wp db export - | gzip > {{ sync_file }}
+    - name: Modify GUID columns
+      set_fact:
+        skip_guids_option: ""
+      when: "skip_guids_column == 'false'"
+
+    - name: PULL database
+      block:
+      - name: PULL > Export & gzip {{ env }} database
+        shell: 'wp db export {{ sync_file }} --skip-plugins --skip-themes && gzip -q {{ sync_file }}'
         args:
           chdir: "{{ project_current }}"
 
       - name: PULL > Pull dump file from {{ env }} to development
         fetch:
-          src: "{{ project_current }}/{{ sync_file }}"
+          src: "{{ project_current }}/{{ sync_file }}.gz"
           dest: "{{ project_local_path }}/"
           flat: yes
 
       - name: PULL > Delete dump file from {{ env }}
         file:
           state: absent
-          path: "{{ project_current }}/{{ sync_file }}"
+          path: "{{ project_current }}/{{ sync_file }}.gz"
 
       - name: PULL > Backup development database
         connection: local
-        shell: vagrant ssh -- 'cd {{ project_current }} && wp db export - | gzip > {{ backup_file }}'
+        shell: vagrant ssh -- 'cd {{ project_current }} && wp db export {{ backup_file }} --skip-plugins --skip-themes && gzip -q {{ backup_file }}'
 
       - name: PULL > Reset development database
         connection: local
-        shell: vagrant ssh -- 'cd {{ project_current }} && wp db reset --yes'
+        shell: vagrant ssh -- 'cd {{ project_current }} && wp db reset --yes --skip-plugins --skip-themes'
 
-      - name: PULL > Import database dump on development
+      - name: PULL > Gunzip & import database dump on development
         connection: local
-        shell: vagrant ssh -- 'cd {{ project_current }} && gzip -c -d {{ sync_file }} | wp db import -'
+        shell: vagrant ssh -- 'cd {{ project_current }} && gunzip -q {{ sync_file }}.gz && wp db import {{ sync_file }} --skip-plugins --skip-themes'
 
       - name: PULL > Delete dump file on development
         connection: local
@@ -59,51 +66,58 @@
 
       - name: PULL > Replace urls "{{ url_env }}" => "{{ url_dev }}" on development
         connection: local
-        shell: vagrant ssh -- "cd {{ project_current }} && wp search-replace '{{ url_env }}' '{{ url_dev }}' --all-tables"
+        shell: vagrant ssh -- "cd {{ project_current }} && wp search-replace '{{ url_env }}' '{{ url_dev }}' {{ skip_guids_option }} --all-tables --skip-plugins --skip-themes"
 
       - name: PULL > Replace protocol-relative urls "//{{ domain_env }}" => "//{{ domain_dev }}" on development
         connection: local
-        shell: vagrant ssh -- "cd {{ project_current }} && wp search-replace '//{{ domain_env }}' '//{{ domain_dev }}' --all-tables"
+        shell: vagrant ssh -- "cd {{ project_current }} && wp search-replace '//{{ domain_env }}' '//{{ domain_dev }}' {{ skip_guids_option }} --all-tables --skip-plugins --skip-themes"
+
+      - name: PULL > Replace emails "@{{ domain_env }}" => "@{{ domain_dev }}" on development
+        connection: local
+        shell: vagrant ssh -- "cd {{ project_current }} && wp search-replace '@{{ domain_env }}' '@{{ domain_dev }}' --all-tables --skip-plugins --skip-themes"
 
       - name: PULL > Replace Elementor urls "{{ url_env }}" => "{{ url_dev }}" on development
         connection: local
-        shell: vagrant ssh -- "cd {{ project_current }} && wp cli has-command 'elementor' && [ $? -eq 0 ] && wp elementor replace_urls '{{ url_env }}' '{{ url_dev }}' || cd ."
+        shell: vagrant ssh -- "cd {{ project_current }} && wp cli has-command 'elementor replace_urls' && [ $? -eq 0 ] && wp elementor replace_urls '{{ url_env }}' '{{ url_dev }}' --skip-themes || cd ."
 
       - name: PULL > Cache flush on development
         connection: local
         shell: vagrant ssh -- "cd {{ project_current }} && wp cache flush"
 
+      - name: PULL > Elementor flush CSS on development
+        connection: local
+        shell: vagrant ssh -- "cd {{ project_current }} && wp cli has-command 'elementor flush_css' && [ $? -eq 0 ] && wp elementor flush_css --skip-themes || cd ."
       when: mode is not defined or mode == "pull"
 
-    # PUSH database
-    - block:
-      - name: PUSH > Export development database
+    - name: PUSH database
+      block:
+      - name: PUSH > Export & gzip development database
         connection: local
-        shell: vagrant ssh -- 'cd {{ project_current }} && wp db export - | gzip > {{ sync_file }}'
+        shell: vagrant ssh -- 'cd {{ project_current }} && wp db export {{ sync_file }} --skip-plugins --skip-themes && gzip -q {{ sync_file }}'
 
       - name: PUSH > Push dump file from development to {{ env }}
         copy:
-          src: "{{ project_local_path }}/{{ sync_file }}"
+          src: "{{ project_local_path }}/{{ sync_file }}.gz"
           dest: "{{ project_current }}/"
 
       - name: PUSH > Delete dump file from development
         connection: local
         file:
           state: absent
-          path: "{{ project_local_path }}/{{ sync_file }}"
+          path: "{{ project_local_path }}/{{ sync_file }}.gz"
 
       - name: PUSH > Backup {{ env }} database
-        shell: wp db export - | gzip > {{ backup_file }}
+        shell: 'wp db export {{ backup_file }} --skip-plugins --skip-themes && gzip -q {{ backup_file }}'
         args:
           chdir: "{{ project_current }}"
 
       - name: PUSH > Reset {{ env }} database
-        command: wp db reset --yes
+        command: wp db reset --yes --skip-plugins --skip-themes
         args:
           chdir: "{{ project_current }}"
 
-      - name: PUSH > Import database dump on {{ env }}
-        shell: gzip -c -d {{ sync_file }} | wp db import -
+      - name: PUSH > Gunzip & import database dump on {{ env }}
+        shell: 'gunzip -q {{ sync_file }}.gz && wp db import {{ sync_file }} --skip-plugins --skip-themes'
         args:
           chdir: "{{ project_current }}"
 
@@ -113,17 +127,22 @@
           path: "{{ project_current }}/{{ sync_file }}"
 
       - name: PUSH > Replace urls "{{ url_dev }}" => "{{ url_env }}" on {{ env }}
-        command: wp search-replace '{{ url_dev }}' '{{ url_env }}' --all-tables
+        command: wp search-replace '{{ url_dev }}' '{{ url_env }}' {{ skip_guids_option }} --all-tables --skip-plugins --skip-themes
         args:
           chdir: "{{ project_current }}"
 
       - name: PUSH > Replace protocol-relative urls "//{{ domain_dev }}" => "//{{ domain_env }}" on {{ env }}
-        command: wp search-replace '//{{ domain_dev }}' '//{{ domain_env }}' --all-tables
+        command: wp search-replace '//{{ domain_dev }}' '//{{ domain_env }}' {{ skip_guids_option }} --all-tables --skip-plugins --skip-themes
+        args:
+          chdir: "{{ project_current }}"
+
+      - name: PUSH > Replace emails "@{{ domain_dev }}" => "@{{ domain_env }}" on {{ env }}
+        command: wp search-replace '@{{ domain_dev }}' '@{{ domain_env }}' --all-tables --skip-plugins --skip-themes
         args:
           chdir: "{{ project_current }}"
 
       - name: PUSH > Replace Elementor urls "{{ url_dev }}" => "{{ url_env }}" on {{ env }}
-        shell: wp cli has-command 'elementor' && [ $? -eq 0 ] && wp elementor replace_urls '{{ url_dev }}' '{{ url_env }}' || cd .
+        shell: wp cli has-command 'elementor replace_urls' && [ $? -eq 0 ] && wp elementor replace_urls '{{ url_dev }}' '{{ url_env }}' --skip-themes || cd .
         args:
           chdir: "{{ project_current }}"
 
@@ -132,4 +151,8 @@
         args:
           chdir: "{{ project_current }}"
 
+      - name: PUSH > Elementor flush CSS on {{ env }}
+        shell: wp cli has-command 'elementor flush_css' && [ $? -eq 0 ] && wp elementor flush_css --skip-themes || cd .
+        args:
+          chdir: "{{ project_current }}"
       when: mode is defined and mode == "push"
