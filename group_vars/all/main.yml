@@ -20,6 +20,8 @@ nginx_wordpress_site_conf: nginx-includes/wordpress-site.conf.child
 nginx_skip_cache_cookie: comment_author|wordpress_[a-f0-9]+|wp-postpass|wordpress_no_cache|wordpress_logged_in|woocommerce_[a-z0-9_]+
 nginx_hsts_include_subdomains: true
 
+h5bp_expires_enabled: true
+
 # PHP
 php_version: "8.0"
 php_memory_limit: 256M

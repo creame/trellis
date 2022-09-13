@@ -9,17 +9,8 @@
   {% block location_uploads_php -%}
   {{ super() }}
 
-  # Set max cache for static files
-  location ~* .(?:ogg|ogv|svg|svgz|eot|otf|woff2?|mp4|ttf|css|rss|atom|js|jpg|jpeg|gif|png|webp|ico|zip|tgz|gz|rar|bz2|doc|xls|exe|ppt|tar|mid|midi|wav|bmp|rtf|cur)$ {
-    expires max;
-    log_not_found off;
-    access_log off;
-    add_header Pragma public;
-    add_header Cache-Control "public";
-  }
-
   {% if image_optimize | default(false) -%}
-  # Try to server WebP images (if exists)
+  # Try to server WebP images
   set $webp_ext "";
 
   if ( $http_accept ~ image/webp ) {
@@ -37,18 +28,18 @@
   location ~* xmlrpc\.php$ { return 444; }
 
   # Protect System Files
-  location = /wp/wp-admin/install.php { deny all; }
-  location ~ /wp/readme\.html$ { deny all; }
-  location ~ /wp/readme\.txt$ { deny all; }
-  location ~ /wp-config.php$ { deny all; }
-  location ~ ^/wp/wp-admin/includes/ { deny all; }
-  location ~ ^/wp/wp-includes/[^/]+\.php$ { deny all; }
+  location = /wp/wp-admin/install.php                   { deny all; }
+  location ~ /wp/readme\.html$                          { deny all; }
+  location ~ /wp/readme\.txt$                           { deny all; }
+  location ~ /wp-config.php$                            { deny all; }
+  location ~ ^/wp/wp-admin/includes/                    { deny all; }
+  location ~ ^/wp/wp-includes/[^/]+\.php$               { deny all; }
   location ~ ^/wp/wp-includes/js/tinymce/langs/.+\.php$ { deny all; }
-  location ~ ^/wp/wp-includes/theme-compat/ { deny all; }
+  location ~ ^/wp/wp-includes/theme-compat/             { deny all; }
 
   {% if item.value.woocommerce | default(false) -%}
   # Protect PDF Invoices
-  location ~ ^/app/uploads/wpo_wcpdf/ { deny all; }
+  location ~ ^/app/uploads/wpo_wcpdf/                   { deny all; }
   {% endif -%}
   {% endblock %}
 
