@@ -80,8 +80,8 @@
     user: "{{ web_user }}"
     job: >
       cd {{ www_root }}/{{ item.key }}/{{ item.value.current_path | default('current') }}
-      && wp language core update > /dev/null
-      && wp language plugin update --all > /dev/null
+      && wp language core update > /dev/null 2>&1
+      && wp language plugin update --all > /dev/null 2>&1
     cron_file: "wordpress-{{ item.key | replace('.', '_') }}"
   with_dict: "{{ wordpress_sites }}"
 
