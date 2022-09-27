@@ -86,11 +86,11 @@ Vagrant.configure('2') do |config|
     fail_with_message "vagrant-bindfs missing, please install the plugin with this command:\nvagrant plugin install vagrant-bindfs"
   else
     trellis_config.wordpress_sites.each_pair do |name, site|
-      config.vm.synced_folder local_site_path(site), nfs_path(name), type: 'nfs'
+      config.vm.synced_folder local_site_path(site), nfs_path(name), type: 'nfs', mount_options: ["vers=4,tcp"]
       config.bindfs.bind_folder nfs_path(name), remote_site_path(name, site), u: 'vagrant', g: 'www-data', o: 'nonempty'
     end
 
-    config.vm.synced_folder ANSIBLE_PATH, '/ansible-nfs', type: 'nfs'
+    config.vm.synced_folder ANSIBLE_PATH, '/ansible-nfs', type: 'nfs', mount_options: ["vers=4,tcp"]
     config.bindfs.bind_folder '/ansible-nfs', ANSIBLE_PATH_ON_VM, o: 'nonempty', p: '0644,a+D'
   end
 
