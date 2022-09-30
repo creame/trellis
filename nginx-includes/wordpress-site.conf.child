@@ -36,11 +36,6 @@
   location ~ ^/wp/wp-includes/[^/]+\.php$               { deny all; }
   location ~ ^/wp/wp-includes/js/tinymce/langs/.+\.php$ { deny all; }
   location ~ ^/wp/wp-includes/theme-compat/             { deny all; }
-
-  {% if item.value.woocommerce | default(false) -%}
-  # Protect PDF Invoices
-  location ~ ^/app/uploads/wpo_wcpdf/                   { deny all; }
-  {% endif -%}
   {% endblock %}
 
   {% block location_primary -%}
