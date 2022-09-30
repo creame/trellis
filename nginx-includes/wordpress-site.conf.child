@@ -108,8 +108,15 @@
 
   location @fallback {
     try_files $uri $uri/ /index.php?$args;
-
-    # Block WP user enumeration
-    if ($args ~ "^author=\d+") { return 403; }
   }
   {% endblock %}
+
+
+    {% block location_php_basic -%}
+    # Block WP user enumeration
+    if ($args ~ "^author=\d+") {
+      return 403;
+    }
+
+    {{ super() }}
+    {% endblock %}
