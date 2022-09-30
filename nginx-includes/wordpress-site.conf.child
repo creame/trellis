@@ -22,7 +22,7 @@
 
     try_files $uri$webp_ext $path$webp_ext $uri =404;
   }
-  {% endif -%}
+  {% endif %}
 
   {% if not item.value.xmlrpc | default(false) -%}
   # Disable XML-RPC
@@ -74,6 +74,7 @@
   set $ce_cache_file      ${ce_cache_file_dir}/${ce_cache_file_name};
 
   location / {
+    add_header X-Cache-Handler nginx-server;
     error_page 405 = @fallback;
     recursive_error_pages on;
 
@@ -83,9 +84,9 @@
     }
 
     # check permalink structure has trailing slash
-    if ($request_uri !~ /[^\./\?]+(\?.*)?$) {
-      return 405;
-    }
+    # if ($request_uri !~ /[^\./\?]+(\?.*)?$) {
+    #   return 405;
+    # }
 
     # check excluded query strings
     if ($query_string ~ ^(?!(fbclid|ref|mc_(cid|eid)|utm_(source|medium|campaign|term|content|expid)|gclid|fb_(action_ids|action_types|source)|age-verified|usqp|cn-reloaded|_ga|_ke)).+$) {
