@@ -24,8 +24,12 @@
   }
   {% endif -%}
 
+  {% if not item.value.xmlrpc | default(false) -%}
   # Disable XML-RPC
-  location ~* xmlrpc\.php$ { return 444; }
+  location ~* xmlrpc\.php$ {
+    return 444;
+  }
+  {% endif -%}
 
   # Protect System Files
   location = /wp/wp-admin/install.php                   { deny all; }
