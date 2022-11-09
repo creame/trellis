@@ -12,7 +12,6 @@ ferm_input_list:
     seconds: 300
     hits: 20
 
-
 # Enable built-in fail2ban services or add your own custom ones
 fail2ban_services_custom:
   - name: wordpress_xmlrpc
