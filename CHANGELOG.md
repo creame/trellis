@@ -1,4 +1,16 @@
-### HEAD
+### 1.18.0: November 8th, 2022
+* Fix xdebug role by including PHP vars ([#1429](https://github.com/roots/trellis/pull/1429))
+* Automate ARM64 Vagrant box support for Apple Silicon ([#1431](https://github.com/roots/trellis/pull/1431))
+* Support ARM64 arch in Mailhog role ([#1432](https://github.com/roots/trellis/pull/1432))
+* Only allow Nginx caching for GET and HEAD requests ([#1435](https://github.com/roots/trellis/pull/1435))
+
+### 1.17.0: September 27th, 2022
+* [BREAKING] Disable HSTS `includeSubdomains` by default ([#1409](https://github.com/roots/trellis/pull/1409))
+* Don't use sudo for composer authentications in dev ([#1427](https://github.com/roots/trellis/pull/1427))
+* Sage 10 deploy: Fail if entrypoints are missing ([#1426](https://github.com/roots/trellis/pull/1426))
+* Nginx: add "text/javascript" to gzip_types ([#1424](https://github.com/roots/trellis/pull/1424))
+* Disable Landrush DNS Resolver in Parallels ([#1421](https://github.com/roots/trellis/pull/1421))
+* Remove dynamic SSH key host checks ([#1419](https://github.com/roots/trellis/pull/1419))
 * Update Vagrant required version ([#1420](https://github.com/roots/trellis/pull/1420))
 * Remove custom output callback plugin ([#1418](https://github.com/roots/trellis/pull/1418))
 * Migrage `with_X` looping usage to `loop` ([#1416](https://github.com/roots/trellis/pull/1416))
@@ -6,7 +18,6 @@
 * Simplify Nginx no-default sites for HTTPS ([#1414](https://github.com/roots/trellis/pull/1414))
 * Improve composer authentications password default ([#1412](https://github.com/roots/trellis/pull/1412))
 * Run composer check-platform-reqs during deploy ([#1411](https://github.com/roots/trellis/pull/1411))
-* [BREAKING] Disable HSTS `includeSubdomains` by default ([#1409](https://github.com/roots/trellis/pull/1409))
 * Fix #905, #831 - Update hb5p Nginx configs ([#1406](https://github.com/roots/trellis/pull/1406))
 
 ### 1.16.0: July 18th, 2022

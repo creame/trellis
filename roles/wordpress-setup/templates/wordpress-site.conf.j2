@@ -36,6 +36,12 @@ server {
   {% if item.value.cache is defined and item.value.cache.enabled | default(false) -%}
   # Fastcgi cache conditions
   set $skip_cache 0;
+
+  # Skip requests with HTTP methods that should not be cached: DELETE, OPTIONS, PATCH, POST, PUT
+  if ($request_method !~ ^(GET|HEAD)$) {
+    set $skip_cache 1;
+  }
+
   if ($query_string != "") {
     set $skip_cache 1;
   }
