@@ -207,6 +207,10 @@ server {
   include h5bp/location/protect-system-files.conf;
   {% endif -%}
 
+  {% if h5bp_referrer_policy_enabled -%}
+  include h5bp/directive-only/referrer-policy.conf;
+  {% endif -%}
+
   {% endblock %}
 
   {% block embed_security -%}

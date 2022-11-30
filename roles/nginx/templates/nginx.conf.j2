@@ -234,6 +234,12 @@ http {
 
   include h5bp/directive-only/cache_expiration.conf;
 
+  # Add Referrer-Policy for HTML documents.
+  # h5bp/directive-only/referrer-policy.conf
+  map $sent_http_content_type $referrer_policy {
+    ~*text/(css|html|javascript)|application\/pdf|xml "strict-origin-when-cross-origin";
+  }
+
   {% block sites_enabled -%}
   # Include files in the sites-enabled folder. server{} configuration files should be
   # placed in the sites-available folder, and then the configuration should be enabled

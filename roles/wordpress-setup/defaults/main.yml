@@ -39,6 +39,7 @@ h5bp_cache_busting_enabled: "{{ h5bp.cache_busting | default(false) }}"
 h5bp_cross_domain_fonts_enabled: "{{ h5bp.cross_domain_fonts | default(true) }}"
 h5bp_expires_enabled: "{{ h5bp.expires | default(false) }}"
 h5bp_protect_system_files_enabled: "{{ h5bp.protect_system_files | default(true) }}"
+h5bp_referrer_policy_enabled: "{{ h5bp.referrer_policy | default(true) }}"
 
 # X-Robots-Tag Header helpers
 not_prod: "{{ env != 'production' }}"
