@@ -56,22 +56,40 @@
     when: project.update_db_on_deploy | default(update_db_on_deploy)
 
   - name: Install core languages
-    command: wp language core install {{ item }}
-    with_items: "{{ project.languages | default(project_languages) }}"
+    command: wp language core install {{ project.languages | default(project_languages) | join(' ') }}
     args:
       chdir: "{{ deploy_helper.current_path }}"
+    when: project.languages | default(project_languages) | count > 1
 
   - name: Install theme languages
-    command: wp language theme install --all {{ item }}
-    with_items: "{{ project.languages | default(project_languages) }}"
+    command: wp language theme install --all {{ project.languages | default(project_languages) | join(' ') }}
     args:
       chdir: "{{ deploy_helper.current_path }}"
+    when: project.languages | default(project_languages) | count > 1
 
   - name: Install plugins languages
-    command: wp language plugin install --all {{ item }}
-    with_items: "{{ project.languages | default(project_languages) }}"
+    command: wp language plugin install --all {{ project.languages | default(project_languages) | join(' ') }}
     args:
       chdir: "{{ deploy_helper.current_path }}"
+    when: project.languages | default(project_languages) | count > 1
+
+  - name: Update installed core languages
+    command: wp language core update
+    args:
+      chdir: "{{ deploy_helper.current_path }}"
+    when: project.languages | default(project_languages) | count > 1
+
+  - name: Update plugins languages
+    command: wp language plugin --all update
+    args:
+      chdir: "{{ deploy_helper.current_path }}"
+    when: project.languages | default(project_languages) | count > 1
+
+  - name: Update themes languages
+    command: wp language theme --all update
+    args:
+      chdir: "{{ deploy_helper.current_path }}"
+    when: project.languages | default(project_languages) | count > 1
 
   - name: Flush WP rewrite rules
     command: wp rewrite flush --hard
