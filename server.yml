@@ -35,7 +35,7 @@
   hosts: web:&{{ env }}
   become: yes
   roles:
-  - role: unattended
+  - role: unattended_upgrades
     unattended_mail: "{{ mail_admin }}"
     unattended_mail_only_on_error: true
     unattended_automatic_reboot: true

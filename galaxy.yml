@@ -19,6 +19,5 @@ roles:
   - src: geerlingguy.mailhog
     version: 2.3.0
 
-  - name: unattended
-    src: jnv.unattended-upgrades
-    version: v1.12.1
+  - name: unattended_upgrades
+    src: hifis.unattended_upgrades
