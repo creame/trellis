@@ -24,3 +24,7 @@ site_packagist_org_authentications:
   - { hostname: packages.crea.me, username: creame, password: "{{ vault_creame_password | default('') }}" }
 site_composer_authentications: "{{ vault_wordpress_sites[site].composer_authentications | default([]) }}"
 composer_authentications: "{{ site_packagist_org_authentications + site_composer_authentications }}"
+# Default `type` is `http-basic`.
+composer_authentications_using_basic_auth: "{{ composer_authentications | rejectattr('type', 'defined') | union( composer_authentications | selectattr('type', 'defined') | selectattr('type', 'equalto', 'http-basic') ) }}"
+composer_authentications_using_bitbucket_oauth: "{{ composer_authentications | selectattr('type', 'defined') | selectattr('type', 'equalto', 'bitbucket-oauth') }}"
+composer_authentications_using_other_token: "{{ composer_authentications | selectattr('type', 'defined') | rejectattr('type', 'equalto', 'http-basic') | rejectattr('type', 'equalto', 'bitbucket-oauth') }}"
