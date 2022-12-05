@@ -74,7 +74,7 @@
   set $ce_cache_file      ${ce_cache_file_dir}/${ce_cache_file_name};
 
   location / {
-    add_header X-Cache-Handler nginx-server;
+    # add_header X-Cache-Handler nginx-server;
     error_page 405 = @fallback;
     recursive_error_pages on;
 
