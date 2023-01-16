@@ -10,17 +10,21 @@
   {{ super() }}
 
   {% if image_optimize | default(false) -%}
-  # Try to server WebP images
+  # Try to server WebP images (can skip with query ?nowebp)
   set $webp_ext "";
 
-  if ( $http_accept ~ image/webp ) {
+  if ($http_accept ~ image/webp) {
     set $webp_ext ".webp";
   }
 
-  location ~* "^(?<path>.+)\.(png|jpe?g)$" {
+  if ($arg_nowebp) {
+    set $webp_ext ".nowebp";
+  }
+
+  location ~* ^/.+\.(png|gif|jpe?g)$ {
     add_header Vary Accept;
 
-    try_files $uri$webp_ext $path$webp_ext $uri =404;
+    try_files $uri$webp_ext $uri =404;
   }
   {% endif %}
 
