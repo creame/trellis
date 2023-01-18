@@ -125,4 +125,4 @@
       && find -type f -iname "*.png"  -mtime -1 -daystart -exec sh -c 'cwebp -quiet -lossless $1 -o "$1.webp"' _ {} \;
     cron_file: "wordpress-{{ item.key | replace('.', '_') }}"
   with_dict: "{{ wordpress_sites }}"
-  when: image_optimize | default(false)
+  when: image_to_webp | default(false)

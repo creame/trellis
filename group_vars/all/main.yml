@@ -27,6 +27,7 @@ php_version: "8.0"
 php_memory_limit: 256M
 php_extensions_custom:
   php8.0-soap: "{{ apt_package_state }}"
+  php8.0-gd: "{{ apt_package_state }}"
 
 # WP-Cli
 # wp_cli_packages:
@@ -39,6 +40,7 @@ update_wp_theme_paths: false
 
 # Enable image optimization cron task and serve webp format
 image_optimize: true
+# image_to_webp: true
 
 # WordPress languages (others than default en_US)
 project_languages:
