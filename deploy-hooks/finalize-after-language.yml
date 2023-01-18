@@ -1,0 +1,35 @@
+---
+- block:
+  - name: Install core languages
+    command: wp language core install {{ project.languages | default(project_languages) | join(' ') }}
+    args:
+      chdir: "{{ deploy_helper.current_path }}"
+
+  - name: Install theme languages
+    command: wp language theme install --all {{ project.languages | default(project_languages) | join(' ') }}
+    args:
+      chdir: "{{ deploy_helper.current_path }}"
+
+  - name: Install plugins languages
+    command: wp language plugin install --all {{ project.languages | default(project_languages) | join(' ') }}
+    args:
+      chdir: "{{ deploy_helper.current_path }}"
+
+  - name: Update core languages
+    command: wp language core update
+    args:
+      chdir: "{{ deploy_helper.current_path }}"
+
+  - name: Update plugins languages
+    command: wp language plugin --all update
+    args:
+      chdir: "{{ deploy_helper.current_path }}"
+
+  - name: Update themes languages
+    command: wp language theme --all update
+    args:
+      chdir: "{{ deploy_helper.current_path }}"
+
+  when:
+    - wp_installed.rc == 0
+    - project.languages | default(project_languages) | count > 0

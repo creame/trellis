@@ -49,6 +49,7 @@ deploy_initialize_after:
   - "{{ playbook_dir }}/deploy-hooks/initialize-after.yml"
 deploy_finalize_after:
   - "{{ playbook_dir }}/deploy-hooks/finalize-after.yml"
+  - "{{ playbook_dir }}/deploy-hooks/finalize-after-language.yml"
 
 # Custom shared children
 project_shared_children:

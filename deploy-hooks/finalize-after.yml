@@ -16,15 +16,15 @@
 
   - name: Update WP theme paths
     command: >
-      wp option set {{ item[0].option }}
+      wp option set {{ item[0].item }}
       {{ item[1] | regex_replace('.*' + deploy_helper.releases_path + '/[^/]*(.*)', deploy_helper.new_release_path + '\1') }}
       {% if project.multisite.enabled | default(false) %} --url={{ item[1].split(' ')[0] }}{% endif %}
     args:
       chdir: "{{ deploy_helper.current_path }}"
-    when: project.update_wp_theme_paths | default(update_wp_theme_paths | default(true)) | bool
-    with_subelements:
-      - "[{% for result in wp_template_root.results %}{'option': '{{ result.item }}', 'stdout_lines': {{ result.stdout_lines | default ([]) | select('search', deploy_helper.releases_path) | list }}},{% endfor %}]"
-      - stdout_lines
+    loop: "{{ wp_template_root.results | subelements('stdout_lines', skip_missing=true) }}"
+    loop_control:
+      label: "{{ item[0].item }}"
+    when: project.update_wp_theme_paths | default(update_wp_theme_paths | default(true)) | bool and item[1] is match(deploy_helper.releases_path)
 
   - name: Warn about updating network database.
     debug:
@@ -44,52 +44,16 @@
     when: project.update_db_on_deploy | default(update_db_on_deploy) and project.woocommerce | default(false)
 
   - name: Update Elementor database
-    shell: wp cli has-command "elementor update db" && [ $? -eq 0 ] && wp elementor update db || cd .
+    shell: "wp cli has-command 'elementor update db' && [ $? -eq 0 ] && wp elementor update db || :"
     args:
       chdir: "{{ deploy_helper.current_path }}"
     when: project.update_db_on_deploy | default(update_db_on_deploy)
 
   - name: Update Elementor Pro database
-    shell: wp cli has-command "elementor-pro update db" && [ $? -eq 0 ] && wp elementor-pro update db || cd .
+    shell: "wp cli has-command 'elementor-pro update db' && [ $? -eq 0 ] && wp elementor-pro update db || :"
     args:
       chdir: "{{ deploy_helper.current_path }}"
     when: project.update_db_on_deploy | default(update_db_on_deploy)
-
-  - name: Install core languages
-    command: wp language core install {{ project.languages | default(project_languages) | join(' ') }}
-    args:
-      chdir: "{{ deploy_helper.current_path }}"
-    when: project.languages | default(project_languages) | count > 0
-
-  - name: Install theme languages
-    command: wp language theme install --all {{ project.languages | default(project_languages) | join(' ') }}
-    args:
-      chdir: "{{ deploy_helper.current_path }}"
-    when: project.languages | default(project_languages) | count > 0
-
-  - name: Install plugins languages
-    command: wp language plugin install --all {{ project.languages | default(project_languages) | join(' ') }}
-    args:
-      chdir: "{{ deploy_helper.current_path }}"
-    when: project.languages | default(project_languages) | count > 0
-
-  - name: Update installed core languages
-    command: wp language core update
-    args:
-      chdir: "{{ deploy_helper.current_path }}"
-    when: project.languages | default(project_languages) | count > 0
-
-  - name: Update plugins languages
-    command: wp language plugin --all update
-    args:
-      chdir: "{{ deploy_helper.current_path }}"
-    when: project.languages | default(project_languages) | count > 0
-
-  - name: Update themes languages
-    command: wp language theme --all update
-    args:
-      chdir: "{{ deploy_helper.current_path }}"
-    when: project.languages | default(project_languages) | count > 0
 
   - name: Flush WP rewrite rules
     command: wp rewrite flush --hard
@@ -106,22 +70,19 @@
     args:
       chdir: "{{ deploy_helper.current_path }}"
 
+  - name: Clear Autoptimize cache
+    shell: "wp cli has-command 'autoptimize clear' && [ $? -eq 0 ] && wp autoptimize clear --quiet || :"
+    args:
+      chdir: "{{ deploy_helper.current_path }}"
+
   - name: Cache Enabler re-activate
-    command: wp plugin {{ item }} cache-enabler
-    with_items:
-      - deactivate
-      - activate
+    shell: "wp cli has-command 'cache-enabler' && [ $? -eq 0 ] && wp plugin deactivate cache-enabler && wp plugin activate cache-enabler || :"
     args:
       chdir: "{{ deploy_helper.current_path }}"
     when: env == "production"
 
-  - name: Clear Autoptimize cache
-    shell: wp cli has-command "autoptimize" && [ $? -eq 0 ] && wp autoptimize clear --quiet || cd .
-    args:
-      chdir: "{{ deploy_helper.current_path }}"
-
   - name: Clear Cache Enabler cache
-    shell: wp cli has-command "cache-enabler" && [ $? -eq 0 ] && wp cache-enabler clear --quiet || cd .
+    shell: "wp cli has-command 'cache-enabler clear' && [ $? -eq 0 ] && wp cache-enabler clear --quiet || :"
     args:
       chdir: "{{ deploy_helper.current_path }}"
 
@@ -129,5 +90,3 @@
 
 - name: Reload php-fpm
   shell: sudo service php{{ php_version }}-fpm reload
-  args:
-    warn: false
