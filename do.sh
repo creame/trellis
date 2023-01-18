@@ -68,6 +68,8 @@ if [ $ACTION == "provision" ]; then
   ansible-playbook server.yml -e env=$ENV $EXTRA_PARAMS
 elif [ $ACTION == "deploy" ]; then
   ansible-playbook deploy.yml -e env=$ENV -e site=$SITE $EXTRA_PARAMS
+  echo "${BLUE}Done $ACTION for '$SITE' <$ENV>${RESET}"
+  echo
 elif [ $ACTION == "uploads-push" ]; then
   ansible-playbook uploads.yml  -e env=$ENV -e site=$SITE -e mode=push
 elif [ $ACTION == "uploads-pull" ]; then
@@ -82,9 +84,13 @@ elif [ $ACTION == "pull" ]; then
   ansible-playbook database.yml -e env=$ENV -e site=$SITE -e mode=pull
   ansible-playbook uploads.yml  -e env=$ENV -e site=$SITE -e mode=pull
   ansible-playbook uploads.yml  -e env=$ENV -e site=$SITE -e mode=loco
+  echo "${BLUE}Done $ACTION for '$SITE' on <$ENV>${RESET}"
+  echo
 elif [ $ACTION == "push" ]; then
   ansible-playbook database.yml -e env=$ENV -e site=$SITE -e mode=push
   ansible-playbook uploads.yml  -e env=$ENV -e site=$SITE -e mode=push
+  echo "${BLUE}Done $ACTION for '$SITE' <$ENV>${RESET}"
+  echo
 elif [ $ACTION == "ssh-web" ]; then
   ssh web@$(cat hosts/$ENV | sed -n 5p)
 elif [ $ACTION == "ssh-admin" ]; then
