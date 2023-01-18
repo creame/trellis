@@ -31,7 +31,7 @@
     - name: PULL database
       block:
       - name: PULL > Export & gzip {{ env }} database
-        shell: 'wp db export {{ sync_file }} --skip-plugins --skip-themes && gzip -q {{ sync_file }}'
+        shell: wp db export {{ sync_file }} --skip-plugins --skip-themes && gzip -q {{ sync_file }}
         args:
           chdir: "{{ project_current }}"
 
@@ -48,15 +48,15 @@
 
       - name: PULL > Backup development database
         connection: local
-        shell: vagrant ssh -- 'cd {{ project_current }} && wp db export {{ backup_file }} --skip-plugins --skip-themes && gzip -q {{ backup_file }}'
+        shell: vagrant ssh -- "cd {{ project_current }} && wp db export {{ backup_file }} --skip-plugins --skip-themes && gzip -q {{ backup_file }}"
 
       - name: PULL > Reset development database
         connection: local
-        shell: vagrant ssh -- 'cd {{ project_current }} && wp db reset --yes --skip-plugins --skip-themes'
+        shell: vagrant ssh -- "cd {{ project_current }} && wp db reset --yes --skip-plugins --skip-themes"
 
       - name: PULL > Gunzip & import database dump on development
         connection: local
-        shell: vagrant ssh -- 'cd {{ project_current }} && gunzip -q {{ sync_file }}.gz && wp db import {{ sync_file }} --skip-plugins --skip-themes'
+        shell: vagrant ssh -- "cd {{ project_current }} && gunzip -q {{ sync_file }}.gz && wp db import {{ sync_file }} --skip-plugins --skip-themes"
 
       - name: PULL > Delete dump file on development
         connection: local
@@ -78,7 +78,7 @@
 
       - name: PULL > Replace Elementor urls "{{ url_env }}" => "{{ url_dev }}" on development
         connection: local
-        shell: vagrant ssh -- "cd {{ project_current }} && wp cli has-command 'elementor replace_urls' && [ $? -eq 0 ] && wp elementor replace_urls '{{ url_env }}' '{{ url_dev }}' --skip-themes || cd ."
+        shell: vagrant ssh -- "cd {{ project_current }} && wp cli has-command 'elementor replace_urls' && [ $? -eq 0 ] && wp elementor replace_urls '{{ url_env }}' '{{ url_dev }}' --skip-themes || :"
 
       - name: PULL > Cache flush on development
         connection: local
@@ -86,14 +86,14 @@
 
       - name: PULL > Elementor flush CSS on development
         connection: local
-        shell: vagrant ssh -- "cd {{ project_current }} && wp cli has-command 'elementor flush_css' && [ $? -eq 0 ] && wp elementor flush_css --skip-themes || cd ."
+        shell: vagrant ssh -- "cd {{ project_current }} && wp cli has-command 'elementor flush_css' && [ $? -eq 0 ] && wp elementor flush_css --skip-themes || :"
       when: mode is not defined or mode == "pull"
 
     - name: PUSH database
       block:
       - name: PUSH > Export & gzip development database
         connection: local
-        shell: vagrant ssh -- 'cd {{ project_current }} && wp db export {{ sync_file }} --skip-plugins --skip-themes && gzip -q {{ sync_file }}'
+        shell: vagrant ssh -- "cd {{ project_current }} && wp db export {{ sync_file }} --skip-plugins --skip-themes && gzip -q {{ sync_file }}"
 
       - name: PUSH > Push dump file from development to {{ env }}
         copy:
@@ -107,7 +107,7 @@
           path: "{{ project_local_path }}/{{ sync_file }}.gz"
 
       - name: PUSH > Backup {{ env }} database
-        shell: 'wp db export {{ backup_file }} --skip-plugins --skip-themes && gzip -q {{ backup_file }}'
+        shell: wp db export {{ backup_file }} --skip-plugins --skip-themes && gzip -q {{ backup_file }}
         args:
           chdir: "{{ project_current }}"
 
@@ -117,7 +117,7 @@
           chdir: "{{ project_current }}"
 
       - name: PUSH > Gunzip & import database dump on {{ env }}
-        shell: 'gunzip -q {{ sync_file }}.gz && wp db import {{ sync_file }} --skip-plugins --skip-themes'
+        shell: gunzip -q {{ sync_file }}.gz && wp db import {{ sync_file }} --skip-plugins --skip-themes
         args:
           chdir: "{{ project_current }}"
 
@@ -142,7 +142,7 @@
           chdir: "{{ project_current }}"
 
       - name: PUSH > Replace Elementor urls "{{ url_dev }}" => "{{ url_env }}" on {{ env }}
-        shell: wp cli has-command 'elementor replace_urls' && [ $? -eq 0 ] && wp elementor replace_urls '{{ url_dev }}' '{{ url_env }}' --skip-themes || cd .
+        shell: "wp cli has-command 'elementor replace_urls' && [ $? -eq 0 ] && wp elementor replace_urls '{{ url_dev }}' '{{ url_env }}' --skip-themes || :"
         args:
           chdir: "{{ project_current }}"
 
@@ -152,7 +152,7 @@
           chdir: "{{ project_current }}"
 
       - name: PUSH > Elementor flush CSS on {{ env }}
-        shell: wp cli has-command 'elementor flush_css' && [ $? -eq 0 ] && wp elementor flush_css --skip-themes || cd .
+        shell: "wp cli has-command 'elementor flush_css' && [ $? -eq 0 ] && wp elementor flush_css --skip-themes || :"
         args:
           chdir: "{{ project_current }}"
       when: mode is defined and mode == "push"

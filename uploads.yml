@@ -26,7 +26,7 @@
 
       - name: Elementor flush CSS on development
         connection: local
-        shell: vagrant ssh -- "cd {{ project_current }} && wp cli has-command 'elementor flush_css' && [ $? -eq 0 ] && wp elementor flush_css --skip-themes || cd ."
+        shell: vagrant ssh -- "cd {{ project_current }} && wp cli has-command 'elementor flush_css' && [ $? -eq 0 ] && wp elementor flush_css --skip-themes || :"
     when: mode is not defined or mode == "pull"
 
   - name: PUSH uploads
@@ -40,7 +40,7 @@
           rsync_opts: --exclude=.DS_Store
 
       - name: Elementor flush CSS on {{ env }}
-        shell: wp cli has-command 'elementor flush_css' && [ $? -eq 0 ] && wp elementor flush_css --skip-themes || cd .
+        shell: "wp cli has-command 'elementor flush_css' && [ $? -eq 0 ] && wp elementor flush_css --skip-themes || :"
         args:
           chdir: "{{ project_current }}"
     when: mode is defined and mode == "push"
