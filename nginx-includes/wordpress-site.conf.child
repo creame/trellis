@@ -9,7 +9,6 @@
   {% block location_uploads_php -%}
   {{ super() }}
 
-  {% if image_optimize | default(false) -%}
   # Try to server WebP images (can skip with query ?nowebp)
   set $webp_ext "";
 
@@ -26,7 +25,11 @@
 
     try_files $uri$webp_ext $uri =404;
   }
-  {% endif %}
+
+  # Handle 404 for common static files
+  location ~* ^/.+\.(css|js|gif|ico|jpe?g|png|svgz?|webp|ttf|woff2?)$ {
+    try_files $uri =404;
+  }
 
   {% if not item.value.xmlrpc | default(false) -%}
   # Disable XML-RPC
