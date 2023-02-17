@@ -122,7 +122,7 @@ server {
 
   {% block location_uploads_php -%}
   # Prevent PHP scripts from being executed inside the uploads folder.
-  location ~* /app/uploads/.*\.php$ {
+  location ~* /{{ item.value.upload_path | default('app/uploads') }}/.*\.php$ {
     deny all;
   }
   {% endblock %}
@@ -172,6 +172,14 @@ server {
   location / {
     try_files $uri $uri/ /index.php?$args;
   }
+  {% endblock %}
+
+  {% block disable_xmlrpc -%}
+    {% if item.value.xmlrpc.enabled is defined and item.value.xmlrpc.enabled == false %}
+      location ~* xmlrpc\.php$ {
+        return 444;
+      }
+    {% endif %}
   {% endblock %}
 
   {% block h5bp -%}

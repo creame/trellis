@@ -18,12 +18,13 @@
 
 - include_tasks: tasks/composer-authentications.yml
   vars:
-    site: "{{ item.key }}"
-    working_dir: "{{ www_root }}/{{ item.key }}/{{ item.value.current_path | default('current') }}/"
+    site: "{{ site.key }}"
+    working_dir: "{{ www_root }}/{{ site.key }}/{{ site.value.current_path | default('current') }}/"
   no_log: true
   loop: "{{ wordpress_sites | dict2items }}"
   loop_control:
-    label: "{{ item.key }}"
+    loop_var: site
+    label: "{{ site.key }}"
 
 - name: Install Dependencies with Composer
   composer:
@@ -49,6 +50,7 @@
            --admin_user="{{ item.value.admin_user | default('admin') }}"
            --admin_password="{{ vault_wordpress_sites[item.key].admin_password }}"
            --admin_email="{{ item.value.admin_email }}"
+  become: no
   args:
     chdir: "{{ www_root }}/{{ item.key }}/{{ item.value.current_path | default('current') }}/"
   register: wp_install

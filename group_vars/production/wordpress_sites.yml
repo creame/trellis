@@ -19,6 +19,8 @@ wordpress_sites:
       provider: letsencrypt
     cache:
       enabled: false
+    xmlrpc:
+      enabled: false
     woocommerce: false
     env:
       wp_post_revisions: 6
