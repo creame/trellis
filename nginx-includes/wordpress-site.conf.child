@@ -12,13 +12,8 @@
   # Try to server WebP images (can skip with query ?nowebp)
   set $webp_ext "";
 
-  if ($http_accept ~ image/webp) {
-    set $webp_ext ".webp";
-  }
-
-  if ($arg_nowebp) {
-    set $webp_ext ".nowebp";
-  }
+  if ($http_accept ~ image/webp) { set $webp_ext ".webp"; }
+  if ($arg_nowebp)               { set $webp_ext ".nowebp"; }
 
   location ~* ^/.+\.(png|gif|jpe?g)$ {
     add_header Vary Accept;
@@ -111,7 +106,6 @@
     try_files $uri $uri/ /index.php?$args;
   }
   {% endblock %}
-
 
     {% block location_php_basic -%}
     # Block WP user enumeration
