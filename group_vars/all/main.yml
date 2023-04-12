@@ -26,8 +26,8 @@ h5bp_expires_enabled: true
 php_version: "8.1"
 php_memory_limit: 256M
 php_extensions_custom:
-  php8.0-soap: "{{ apt_package_state }}"
-  php8.0-gd: "{{ apt_package_state }}"
+  php8.1-soap: "{{ apt_package_state }}"
+  php8.1-gd: "{{ apt_package_state }}"
 
 # WP-Cli
 # wp_cli_packages:
