@@ -23,7 +23,7 @@ nginx_hsts_include_subdomains: true
 h5bp_expires_enabled: true
 
 # PHP
-php_version: "8.0"
+php_version: "8.1"
 php_memory_limit: 256M
 php_extensions_custom:
   php8.0-soap: "{{ apt_package_state }}"
