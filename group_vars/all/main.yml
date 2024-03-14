@@ -23,11 +23,11 @@ nginx_hsts_include_subdomains: true
 h5bp_expires_enabled: true
 
 # PHP
-php_version: "8.1"
+php_version: "8.2"
 php_memory_limit: 256M
 php_extensions_custom:
-  php8.1-soap: "{{ apt_package_state }}"
-  php8.1-gd: "{{ apt_package_state }}"
+  php8.2-soap: "{{ apt_package_state }}"
+  php8.2-gd: "{{ apt_package_state }}"
 
 # WP-Cli
 # wp_cli_packages:
