@@ -7,8 +7,6 @@
   {% endblock -%}
 
   {% block location_uploads_php -%}
-  {{ super() }}
-
   # Try to server WebP images (can skip with query ?nowebp)
   set $webp_ext "";
 
@@ -35,6 +33,8 @@
   location ~ ^/wp/wp-includes/[^/]+\.php$               { deny all; }
   location ~ ^/wp/wp-includes/js/tinymce/langs/.+\.php$ { deny all; }
   location ~ ^/wp/wp-includes/theme-compat/             { deny all; }
+
+  {{ super() }}
   {% endblock %}
 
   {% block location_primary -%}
@@ -108,6 +108,7 @@
   {% endblock %}
 
     {% block location_php_basic -%}
+
     # Block WP user enumeration
     if ($args ~ "^author=\d+") {
       return 403;
