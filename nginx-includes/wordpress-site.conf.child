@@ -66,7 +66,7 @@
   # get cache file
   set $ce_cache_file_dir  ${ce_cache_dir}/${http_host}${request_uri};
   set $ce_cache_file_name ${ce_cache_key_scheme}index${ce_cache_key_device}.html${ce_cache_key_compression};
-  set $ce_cache_file      ${ce_cache_file_dir}/${ce_cache_file_name};
+  set $ce_cache_file      ${ce_cache_file_dir}${ce_cache_file_name};
 
   location / {
     # add_header X-Cache-Handler nginx-server;
@@ -107,12 +107,12 @@
   }
   {% endblock %}
 
-    {% block location_php_basic -%}
+  {% block location_php_basic -%}
 
     # Block WP user enumeration
     if ($args ~ "^author=\d+") {
       return 403;
     }
 
-    {{ super() }}
-    {% endblock %}
+  {{ super() }}
+  {% endblock %}
