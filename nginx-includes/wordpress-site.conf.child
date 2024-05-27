@@ -1,5 +1,10 @@
 {% extends 'roles/wordpress-setup/templates/wordpress-site.conf.j2' %}
 
+  {% block logs -%}
+  access_log   {{ www_root }}/{{ item.key }}/logs/access.log main;
+  error_log    {{ www_root }}/{{ item.key }}/logs/error.log error;
+  {% endblock %}
+
   {% block multisite_rewrites -%}
   rewrite ^/wp/?$ / permanent;
 
