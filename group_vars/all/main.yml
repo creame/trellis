@@ -35,6 +35,7 @@ php_extensions_custom:
 #   - wp-cli/doctor-command
 #   - wp-cli/profile-command
 #   - aaemnnosttv/wp-cli-login-command
+#   - mahi-mahi/wp-cli-test-email
 
 # Disable wp option update releases path on deploy
 update_wp_theme_paths: false
