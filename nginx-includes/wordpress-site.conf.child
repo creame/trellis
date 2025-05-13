@@ -59,9 +59,9 @@
   }
 
   # device cache key
-  # if ($http_user_agent ~ "(Mobile|Android|Silk/|Kindle|BlackBerry|Opera Mini|Opera Mobi)") {
-  #    set $ce_cache_key_device "-mobile";
-  # }
+  if ($http_user_agent ~ "(Mobile|Android|Silk/|Kindle|BlackBerry|Opera Mini|Opera Mobi)") {
+    set $ce_cache_key_device "-mobile";
+  }
 
   # compression cache key
   # if ($http_accept_encoding ~ gzip) {
@@ -74,7 +74,6 @@
   set $ce_cache_file      ${ce_cache_file_dir}${ce_cache_file_name};
 
   location / {
-    # add_header X-Cache-Handler nginx-server;
     error_page 405 = @fallback;
     recursive_error_pages on;
 
