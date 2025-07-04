@@ -6,6 +6,7 @@ apt_packages_custom:
   jpegoptim: "{{ apt_package_state }}"
   optipng: "{{ apt_package_state }}"
   webp: "{{ apt_package_state }}"
+apt_clean_sources: false
 composer_keep_updated: true
 ntp_timezone: Etc/UTC
 ntp_manage_config: true
