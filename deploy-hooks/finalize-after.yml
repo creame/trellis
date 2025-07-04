@@ -55,10 +55,11 @@
       chdir: "{{ deploy_helper.current_path }}"
     when: project.update_db_on_deploy | default(update_db_on_deploy)
 
-  - name: Flush WP rewrite rules
-    command: wp rewrite flush --hard
+  - name: Flush rewrite rules
+    command: wp rewrite flush
     args:
       chdir: "{{ deploy_helper.current_path }}"
+    when: project.flush_rewrite_rules_on_deploy | default(flush_rewrite_rules_on_deploy)
 
   - name: Remove WP transients
     command: wp transient delete --all
