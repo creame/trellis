@@ -69,7 +69,7 @@
   # }
 
   # get cache file
-  set $ce_cache_file_dir  ${ce_cache_dir}/${http_host}${request_uri};
+  set $ce_cache_file_dir  ${ce_cache_dir}/${http_host}${uri};
   set $ce_cache_file_name ${ce_cache_key_scheme}index${ce_cache_key_device}.html${ce_cache_key_compression};
   set $ce_cache_file      ${ce_cache_file_dir}${ce_cache_file_name};
 
