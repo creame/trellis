@@ -25,7 +25,7 @@
   }
 
   # Handle 404 for common static files
-  location ~* ^/.+\.(css|js|gif|ico|jpe?g|png|svgz?|webp|ttf|woff2?)$ {
+  location ~* ^/.+\.(css|js|gif|ico|jpe?g|png|svgz?|webp|ttf|woff2?|rar|zip|t?gz)$ {
     try_files $uri =404;
   }
 
