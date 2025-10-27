@@ -1,5 +1,7 @@
 mysql_root_password: "{{ vault_mysql_root_password }}" # Define this variable in group_vars/production/vault.yml
 
+php_error_reporting: "E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR"
+
 ssmtp_revaliases:
   - user: root
     from: "root@{{ mail_hostname }}"
