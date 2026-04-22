@@ -6,6 +6,15 @@ server {
   {% block server_id -%}
   listen {{ ssl_enabled | ternary('[::]:443 ssl', '[::]:80') }};
   listen {{ ssl_enabled | ternary('443 ssl', '80') }};
+
+  {% if nginx_http3_enabled and ssl_enabled -%}
+  # Listen on UDP for QUIC+HTTP/3
+  listen [::]:443 quic{% if is_first_site_use_ssl %} reuseport{% endif -%};
+  listen 443 quic{% if is_first_site_use_ssl %} reuseport{% endif -%};
+  {% if is_first_site_use_ssl -%}# there has to be one listen quic directive with `reuseport` for working QUIC responses in current nginx version, using the first site.
+  {% endif %}
+  {% endif %}
+
   http2 {{ nginx_http2_enabled | default(false) | ternary('on', 'off') }};
   http3 {{ nginx_http3_enabled | default(false) | ternary('on', 'off') }};
   server_name {{ site_hosts_canonical | union(multisite_subdomains_wildcards) | join(' ') }};
@@ -35,6 +44,11 @@ server {
   sendfile off;
 
   {% endif -%}
+
+  {% if nginx_http3_enabled and ssl_enabled -%}
+  include includes/directive-only/quic-tune.conf;
+  include includes/directive-only/http3-negotiate.conf;
+  {% endif %}
   {% endblock -%}
 
   {% block cache_conditions -%}
@@ -69,7 +83,7 @@ server {
 
   {% else -%}
   if (!-e $request_filename) {
-    rewrite /wp-admin$ $scheme://$host$uri/ permanent;
+    rewrite /wp-admin$ $scheme://$host$request_uri/ permanent;
     rewrite ^(/[^/]+)?(/wp-.*) /wp$2 last;
     rewrite ^(/[^/]+)?(/.*\.php) /wp$2 last;
   }
@@ -89,12 +103,12 @@ server {
   add_header Strict-Transport-Security "max-age={{ [hsts_max_age, hsts_include_subdomains, hsts_preload] | reject('equalto', omit) | join('; ') | trim }}";
   {% endif -%}
 
-  {% if item.value.ssl.client_cert_url is defined -%}
+  {% if 'client_cert_url' in item.value.ssl -%}
   ssl_verify_client       on;
   ssl_client_certificate  {{ nginx_ssl_path }}/client-{{ (item.value.ssl.client_cert_url | hash('md5'))[:7] }}.crt;
   {% endif -%}
 
-  {% if item.value.ssl.provider | default('manual') == 'manual' and item.value.ssl.cert is defined and item.value.ssl.key is defined -%}
+  {% if item.value.ssl.provider | default('manual') == 'manual' and 'cert' in item.value.ssl and 'key' in item.value.ssl -%}
   ssl_certificate         {{ nginx_path }}/ssl/{{ item.value.ssl.cert | basename }};
   ssl_certificate_key     {{ nginx_path }}/ssl/{{ item.value.ssl.key | basename }};
 
@@ -170,6 +184,13 @@ server {
   }
   {% endblock %}
 
+  {% block plugin_theme_docs_files -%}
+  # Block .txt and .md files in plugins, mu-plugins, and themes directories to prevent version disclosure
+  location ~* /app/(plugins|mu-plugins|themes)/.+\.(txt|md)$ {
+    deny all;
+  }
+  {% endblock %}
+
   {% block location_primary -%}
   location / {
     try_files $uri $uri/ /index.php?$args;
@@ -177,7 +198,7 @@ server {
   {% endblock %}
 
   {% block disable_xmlrpc -%}
-    {% if item.value.xmlrpc.enabled is defined and item.value.xmlrpc.enabled == false %}
+    {% if 'xmlrpc' in item.value and item.value.xmlrpc.enabled | default(true) == false %}
       location ~* xmlrpc\.php$ {
         return 444;
       }
@@ -249,9 +270,9 @@ server {
     {% if fastcgi_cache_enabled -%}
     # Fastcgi cache settings
     fastcgi_cache wordpress;
-    fastcgi_cache_valid {{ item.value.cache.duration | default(nginx_cache_duration) }};
+    fastcgi_cache_valid 200 {{ item.value.cache.duration | default(nginx_cache_duration) }};
     fastcgi_cache_bypass $skip_cache;
-    fastcgi_no_cache $skip_cache;
+    fastcgi_no_cache $skip_cache $upstream_http_location;
     fastcgi_cache_background_update {{ item.value.cache.background_update | default(nginx_cache_background_update) }};
 
     {% endif -%}
@@ -291,7 +312,7 @@ server {
 {% endblock -%}
 
 {%- block redirects_domains %}
-{% if site_hosts_redirects | default([]) | count %}
+{% if site_hosts_redirects | default([]) | count > 0 %}
 # Redirect some domains
 {% endif %}
 {% for host in item.value.site_hosts if host.redirects | default([]) %}
@@ -300,11 +321,23 @@ server {
   listen [::]:443 ssl;
   listen 443 ssl;
   {% endif -%}
+
   listen [::]:80;
   listen 80;
+
+  {% if nginx_http3_enabled and ssl_enabled -%}
+  # Listen on UDP for QUIC+HTTP/3
+  listen [::]:443 quic;
+  listen 443 quic;
+  {% endif %}
+
   http2 {{ nginx_http2_enabled | default(false) | ternary('on', 'off') }};
   http3 {{ nginx_http3_enabled | default(false) | ternary('on', 'off') }};
   server_name {{ host.redirects | join(' ') }};
+
+  {% if nginx_http3_enabled and ssl_enabled -%}
+  include includes/directive-only/quic-tune.conf;
+  {% endif %}
 
   {{ self.https() -}}
 

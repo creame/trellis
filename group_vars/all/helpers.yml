@@ -14,6 +14,7 @@ wordpress_env_defaults:
 redis_cache_env:
   wp_redis_host: "{{ item.value.object_cache.host | default('127.0.0.1') }}"
   wp_redis_port: "{{ item.value.object_cache.port | default(6379) }}"
+  wp_redis_password: "{{ item.value.object_cache.password | default('') }}"
   wp_redis_database: "{{ item.value.object_cache.database | default(0) }}"
   wp_redis_prefix: "{{ item.value.object_cache.prefix | default(item.key | underscore + '_') }}"
   wp_cache_key_salt: "{{ item.key }}_{{ env }}"
@@ -39,7 +40,9 @@ site_hosts: "{{ site_hosts_canonical | union(site_hosts_redirects) }}"
 multisite_subdomains_wildcards: "{{ item.value.multisite.subdomains | default(false) | ternary( site_hosts_canonical | map('regex_replace', '^(www\\.)?(.*)$', '*.\\2') | list, [] ) }}"
 ssl_enabled: "{{ item.value.ssl is defined and item.value.ssl.enabled | default(false) }}"
 cron_enabled: "{{ site_env.disable_wp_cron and (not item.value.multisite.enabled | default(false) or (item.value.multisite.enabled | default(false) and item.value.multisite.cron | default(true))) }}"
-sites_use_ssl: "{{ (wordpress_sites | select_sites('ssl.enabled', 'true') | length) > 0 }}"
+sites_using_ssl: "{{ wordpress_sites | dict2items | selectattr('value.ssl.enabled', 'equalto', true) | items2dict }}"
+first_site_using_ssl: "{{ (sites_using_ssl | dict2items | first | default(None, True)) }}"
+sites_use_ssl: "{{ sites_using_ssl | length > 0 }}"
 
 site_packagist_org_authentications:
   - { hostname: packages.crea.me, username: creame, password: "{{ vault_creame_password | default('') }}" }
@@ -48,4 +51,5 @@ composer_authentications: "{{ site_packagist_org_authentications + site_composer
 # Default `type` is `http-basic`.
 composer_authentications_using_basic_auth: "{{ composer_authentications | rejectattr('type', 'defined') | union( composer_authentications | selectattr('type', 'defined') | selectattr('type', 'equalto', 'http-basic') ) }}"
 composer_authentications_using_bitbucket_oauth: "{{ composer_authentications | selectattr('type', 'defined') | selectattr('type', 'equalto', 'bitbucket-oauth') }}"
-composer_authentications_using_other_token: "{{ composer_authentications | selectattr('type', 'defined') | rejectattr('type', 'equalto', 'http-basic') | rejectattr('type', 'equalto', 'bitbucket-oauth') }}"
+composer_authentications_using_custom_headers: "{{ composer_authentications | selectattr('type', 'defined') | selectattr('type', 'equalto', 'custom-headers') }}"
+composer_authentications_using_other_token: "{{ composer_authentications | selectattr('type', 'defined') | rejectattr('type', 'equalto', 'http-basic') | rejectattr('type', 'equalto', 'bitbucket-oauth') | rejectattr('type', 'equalto', 'custom-headers') }}"

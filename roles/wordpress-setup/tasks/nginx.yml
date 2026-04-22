@@ -7,7 +7,7 @@
   loop: "{{ wordpress_sites | dict2items }}"
   loop_control:
     label: "{{ item.key }}"
-  when: ssl_enabled and item.value.ssl.cert is defined
+  when: ssl_enabled and 'cert' in item.value.ssl
   notify: reload nginx
 
 - name: Copy SSL key
@@ -18,10 +18,17 @@
   loop: "{{ wordpress_sites | dict2items }}"
   loop_control:
     label: "{{ item.key }}"
-  when: ssl_enabled and item.value.ssl.key is defined
+  when: ssl_enabled and 'key' in item.value.ssl
   notify: reload nginx
 
 - import_tasks: "{{ playbook_dir }}/roles/common/tasks/disable_challenge_sites.yml"
+
+- name: Copy Nginx Wordpress site include folder
+  copy:
+    src: templates/includes
+    dest: "{{ nginx_path }}"
+    mode: '0755'
+  notify: reload nginx
 
 - name: Create Nginx available sites
   template:
@@ -48,8 +55,8 @@
     src: "{{ nginx_path }}/sites-available/{{ item.src | basename | regex_replace('.j2$', '') }}"
     state: link
     force: yes
-  when: item.enabled | default(true)
   loop: "{{ nginx_sites_confs }}"
+  when: item.enabled | default(true)
   notify: reload nginx
   tags: nginx-sites
 
@@ -68,6 +75,8 @@
   loop: "{{ wordpress_sites | dict2items }}"
   loop_control:
     label: "{{ item.key }}"
+  vars:
+    is_first_site_use_ssl: "{{ (first_site_using_ssl.key == item.key) if first_site_using_ssl else false }}"
   notify: reload nginx
   tags: nginx-includes
 

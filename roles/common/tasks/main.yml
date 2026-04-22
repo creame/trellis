@@ -2,7 +2,7 @@
 - name: Validate wordpress_sites
   fail:
     msg: "{{ lookup('template', 'wordpress_sites.j2') }}"
-  when: wordpress_sites.keys() | difference(vault_wordpress_sites.keys()) | count
+  when: wordpress_sites.keys() | difference(vault_wordpress_sites.keys()) | count > 0
   tags: [wordpress]
 
 - name: Validate format of site_hosts
@@ -11,7 +11,7 @@
   loop: "{{ wordpress_sites | dict2items }}"
   loop_control:
     label: "{{ item.key }}"
-  when: item.value.site_hosts | rejectattr('canonical', 'defined') | list | count
+  when: item.value.site_hosts | rejectattr('canonical', 'defined') | list | count > 0
   tags: [letsencrypt, wordpress]
 
 - name: Import PHP version specific vars
@@ -29,7 +29,7 @@
 - name: Verify dict format for package component variables
   fail:
     msg: "{{ lookup('template', 'package_vars_wrong_format_msg.j2') }}"
-  when: package_vars_wrong_format | count
+  when: package_vars_wrong_format | count > 0
   vars:
     package_vars:
       apt_packages_default: "{{ apt_packages_default }}"
@@ -40,39 +40,21 @@
       php_extensions_custom: "{{ php_extensions_custom }}"
       sshd_packages_default: "{{ sshd_packages_default }}"
       sshd_packages_custom: "{{ sshd_packages_custom }}"
-    package_vars_wrong_format: "[{% for k,v in package_vars.items() | list if v | type_debug != 'dict' %}'{{ k }}',{% endfor %}]"
+    package_vars_wrong_format: "{{ package_vars | dict2items | rejectattr('value', 'mapping') | map(attribute='key') | list }}"
   tags: [memcached, php, sshd]
 
 - name: Verify dict format for package combined variables
   fail:
     msg: "{{ lookup('template', 'package_vars_wrong_format_msg.j2') }}"
-  when: package_vars_wrong_format | count
+  when: package_vars_wrong_format | count > 0
   vars:
     package_vars:
       apt_packages: "{{ apt_packages }}"
       memcached_packages: "{{ memcached_packages }}"
       php_extensions: "{{ php_extensions }}"
       sshd_packages: "{{ sshd_packages }}"
-    package_vars_wrong_format: "[{% for k,v in package_vars.items() | list if v | type_debug != 'dict' %}'{{ k }}',{% endfor %}]"
+    package_vars_wrong_format: "{{ package_vars | dict2items | rejectattr('value', 'mapping') | map(attribute='key') | list }}"
   tags: [memcached, php, sshd]
-
-- name: Validate Ubuntu version
-  debug:
-    msg: |
-      Ubuntu 18.04 Bionic is the minimum supported version of Ubuntu in Trellis 1.0+ (as of https://github.com/roots/trellis/pull/992)
-
-      20.04 Focal is the recommend version for Trellis 1.7+ (as of https://github.com/roots/trellis/pull/1197)
-
-      Your Ubuntu version is {{ ansible_distribution_version }} {{ ansible_distribution_release }}
-
-      We recommend you re-create your server to get the best experience.
-
-      Note: both of these methods will delete all your existing data. It's up to you to backup what's needed and restore it.
-
-      Development via Vagrant: `vagrant destroy && vagrant up`
-
-      Staging/Production: Create a new server with Ubuntu 20.04 and provision
-  when: ansible_distribution_version is version('18.04', '<')
 
 - name: Clean old APT sources
   import_tasks: clean-apt-sources.yml

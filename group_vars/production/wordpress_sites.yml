@@ -23,4 +23,4 @@ wordpress_sites:
       enabled: false
     woocommerce: false
     env:
-      wp_post_revisions: 6
+      wp_post_revisions: 5
