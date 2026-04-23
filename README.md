@@ -28,7 +28,7 @@ Roots is an independent open source org, supported only by developers like you. 
 
 Trellis is a collection of Ansible playbooks for setting up a LEMP stack for WordPress.
 
-- Local development environment with Lima VMs
+- Local development environment with Vagrant
 - High-performance production servers
 - Zero-downtime deploys for your [Bedrock](https://roots.io/bedrock/)-based WordPress sites
 - [trellis-cli](https://github.com/roots/trellis-cli) for easier management

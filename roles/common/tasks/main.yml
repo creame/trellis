@@ -82,6 +82,12 @@
     regexp: ^(hosts\:((?!myhostname).)*)$
     state: present
 
+- name: Generate SSH key for vagrant user for ansible_local provisioning
+  user:
+    name: vagrant
+    generate_ssh_key: yes
+  when: vagrant_local_provisioning | default(false)
+
 - block:
     - name: Retrieve SSH client IP
       ipify_facts:

@@ -2,6 +2,7 @@
 - name: "WordPress Server: Install LEMP Stack with PHP and MariaDB MySQL"
   hosts: web:&development
   become: yes
+  remote_user: vagrant
 
   roles:
     - { role: common, tags: [common] }
