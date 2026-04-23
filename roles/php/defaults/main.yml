@@ -16,7 +16,7 @@ php_memory_limit: 96M
 php_cli_memory_limit: -1
 php_mysqlnd_collect_memory_statistics: 'Off'
 php_post_max_size: 25M
-php_sendmail_path: /usr/sbin/ssmtp -t
+php_sendmail_path: /usr/bin/msmtp -t
 php_session_save_path: /tmp
 php_session_cookie_httponly: 'On'
 php_session_cookie_secure: 'Off'
@@ -35,8 +35,8 @@ php_opcache_revalidate_freq: 60
 php_opcache_validate_timestamps: 1
 php_opcache_max_wasted_percentage: 5
 php_opcache_huge_code_pages: 0
-php_opcache_jit: 'tracing'
-php_opcache_jit_buffer_size: 256M
+php_opcache_jit: 'disable'
+php_opcache_jit_buffer_size: 0
 
 php_fpm_set_emergency_restart_threshold: false
 php_fpm_emergency_restart_threshold: 0
