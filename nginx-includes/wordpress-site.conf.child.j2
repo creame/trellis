@@ -39,6 +39,11 @@
   location ~ ^/wp/wp-includes/js/tinymce/langs/.+\.php$ { deny all; }
   location ~ ^/wp/wp-includes/theme-compat/             { deny all; }
 
+  # Block user enumeration via REST API
+  location ~* /wp-json/wp/v2/users {
+    return 403;
+  }
+
   {{ super() }}
   {% endblock %}
 
@@ -113,7 +118,7 @@
 
   {% block location_php_basic -%}
 
-    # Block WP user enumeration
+    # Block WP user enumeration (query parameter)
     if ($args ~ "^author=\d+") {
       return 403;
     }
