@@ -1,0 +1,8 @@
+# {{ ansible_managed }}
+# Fail2Ban filter to block attempts to access .git repository files
+
+[Definition]
+failregex = ^<HOST> .* "GET .*\.git/
+            ^<HOST> .* "GET .*\.gitlab-ci\.yml
+            ^<HOST> .* "GET .*docker-compose\.yml
+ignoreregex =

@@ -1,0 +1,19 @@
+# {{ ansible_managed }}
+# Fail2Ban filter to block attempts to access .env files and similar configuration files
+
+[Definition]
+failregex = ^<HOST> .* "GET .*\.env
+            ^<HOST> .* "GET .*config\.php
+            ^<HOST> .* "GET .*\.aws/
+            ^<HOST> .* "GET .*credentials\.json
+            ^<HOST> .* "GET .*secrets\.json
+            ^<HOST> .* "GET .*phpinfo
+            ^<HOST> .* "GET .*wp-config\.php
+            ^<HOST> .* "GET .*/phpmyadmin
+            ^<HOST> .* "GET .*/myadmin
+            ^<HOST> .* "GET .*/adminer
+            ^<HOST> .* "GET .*/shell\.php
+            ^<HOST> .* "GET .*/backup\.php
+            ^<HOST> .* "GET .*/setup\.php
+            ^<HOST> .* "GET .*/1\.php
+ignoreregex =

@@ -29,11 +29,60 @@ fail2ban_services_custom:
     enabled: "true"
     port: http,https
     logpath: "{{ www_root }}/**/logs/access.log"
+    maxretry: 5
+    bantime: 3600
   - name: wordpress_wp_login
     filter: wordpress-wp-login
     enabled: "true"
     port: http,https
     logpath: "{{ www_root }}/**/logs/access.log"
+    maxretry: 5
+    bantime: 3600
+  - name: wordpress_user_enum
+    filter: wordpress-user-enum
+    enabled: "true"
+    port: http,https
+    logpath: "{{ www_root }}/**/logs/access.log"
+    maxretry: 5
+    bantime: 3600
+  - name: wordpress_env_probe
+    filter: wordpress-env-probe
+    enabled: "true"
+    port: http,https
+    logpath: "{{ www_root }}/**/logs/access.log"
+    maxretry: 2
+    bantime: 86400
+  - name: wordpress_git_probe
+    filter: wordpress-git-probe
+    enabled: "true"
+    port: http,https
+    logpath: "{{ www_root }}/**/logs/access.log"
+    maxretry: 2
+    bantime: 86400
+  - name: nginx_php_scan
+    filter: nginx-php-scan
+    enabled: "true"
+    port: http,https
+    logpath: "{{ www_root }}/**/logs/access.log"
+    maxretry: 15
+    findtime: 30
+    bantime: 86400
+  - name: wordpress_wp_admin_404
+    filter: wordpress-wp-admin-404
+    enabled: "true"
+    port: http,https
+    logpath: "{{ www_root }}/**/logs/access.log"
+    maxretry: 10
+    findtime: 300
+    bantime: 3600
+  - name: nginx_scan_flood
+    filter: nginx-scan-flood
+    enabled: "true"
+    port: http,https
+    logpath: "{{ www_root }}/**/logs/access.log"
+    maxretry: 120
+    findtime: 30
+    bantime: 3600
 
 # If sshd_permit_root_login: false, admin_user must be in 'users' (`group_vars/all/users.yml`) with sudo group
 # and in 'vault_users' (`group_vars/staging/vault.yml`, `group_vars/production/vault.yml`)

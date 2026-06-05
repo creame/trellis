@@ -1,0 +1,10 @@
+# {{ ansible_managed }}
+# Fail2Ban filter to detect wp-admin scanning
+# Blocks IPs that search for non-existent files in wp-admin (vulnerability scanners)
+
+[Definition]
+
+# Detects 404 errors in wp-admin (scanners looking for vulnerabilities)
+failregex = ^<HOST> .* "(GET|POST) .*/wp-admin/.* HTTP.*" 404
+
+ignoreregex =

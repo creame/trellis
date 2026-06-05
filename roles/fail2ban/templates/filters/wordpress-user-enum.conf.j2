@@ -1,0 +1,7 @@
+# {{ ansible_managed }}
+# Fail2Ban filter to block WordPress user enumeration attempts
+
+[Definition]
+failregex = ^<HOST> .* "GET .*\?author=\d+
+            ^<HOST> .* "GET .*/wp-json/wp/v2/users
+ignoreregex =

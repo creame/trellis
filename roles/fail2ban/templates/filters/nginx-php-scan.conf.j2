@@ -1,0 +1,5 @@
+[Definition]
+# Detects mass scanning of random PHP files (webshell scanners / DDoS via 403/404/429 floods).
+# Matches any GET/POST/HEAD to a .php path that nginx returns 403, 404, or 429.
+failregex = ^<HOST> \S+ \S+ \[[^\]]+\] "(GET|POST|HEAD) [^"]*\.php[^"]*" (403|404|429) \d+
+ignoreregex =

@@ -1,0 +1,8 @@
+[Definition]
+# Detects high-rate HTTP scanning/flooding against likely invalid endpoints.
+# Matches 403 (forbidden), 404 (not found), and 499 (client closed connection).
+# Note: 429 (rate limited) excluded to avoid conflicts with nginx rate limiting.
+# Note: 499 can indicate DDoS attacks (client closes connections rapidly) but also legitimate cancellations.
+# Use high maxretry (120+) to avoid false positives from normal user behavior.
+failregex = ^<HOST> \S+ \S+ \[[^\]]+\] "(GET|POST|HEAD) [^"]* HTTP/[^"]*" (403|404|499) \d+
+ignoreregex =
