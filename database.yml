@@ -16,6 +16,7 @@
     url_env: "{{ project.ssl.enabled | ternary('https', 'http') }}://{{ domain_env }}"
     skip_guids_option: "--skip-columns=guid"
     skip_guids_column: "{{ skip_guids | default('false') }}"
+    ansible_python_interpreter: /usr/bin/python3
 
   tasks:
     - name: Abort if environment variable is equal to development

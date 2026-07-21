@@ -7,6 +7,7 @@
     project: "{{ wordpress_sites[site] }}"
     project_current: "{{ www_root }}/{{ site }}/current"
     project_local_path: "{{ (lookup('env', 'USER') == 'vagrant') | ternary(project_current, project.local_path) }}"
+    ansible_python_interpreter: /usr/bin/python3
 
   tasks:
   - name: Abort if environment variable is equal to development
