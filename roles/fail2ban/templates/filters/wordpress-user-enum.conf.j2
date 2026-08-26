@@ -3,5 +3,5 @@
 
 [Definition]
 failregex = ^<HOST> .* "GET .*\?author=\d+
-            ^<HOST> .* "GET .*/wp-json/wp/v2/users
+            ^<HOST> .* "GET .*/wp-json/wp/v2/users(?:\?| |/($|\?)|/(?!me(?:/|\?| |$)).+)
 ignoreregex =

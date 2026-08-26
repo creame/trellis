@@ -40,7 +40,7 @@
   location ~ ^/wp/wp-includes/theme-compat/             { deny all; }
 
   # Block user enumeration via REST API
-  location ~* /wp-json/wp/v2/users {
+  location ~* ^/wp-json/wp/v2/users(?:/(?!me/?$).*)?/?$ {
     return 403;
   }
 
