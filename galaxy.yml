@@ -30,3 +30,4 @@ roles:
 
   - name: unattended_upgrades
     src: hifis.unattended_upgrades
+    version: v3.2.1
