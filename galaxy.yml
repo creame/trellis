@@ -14,7 +14,11 @@ roles:
 
   - name: swapfile
     src: oefenweb.swapfile
-    version: v2.0.42
+    version: v2.0.44
+
+  - name: msmtp
+    src: roots.msmtp
+    version: v1.1.0
 
   - name: msmtp
     src: roots.msmtp
@@ -22,7 +26,7 @@ roles:
 
   - name: mailpit
     src: roots.mailpit
-    version: v1.0.0
+    version: v1.0.1
 
   - name: unattended_upgrades
     src: hifis.unattended_upgrades
