@@ -2,6 +2,8 @@ mysql_root_password: "{{ vault_mysql_root_password }}" # Define this variable in
 
 php_error_reporting: "E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR"
 
+# cloudflare_enabled: true
+
 ssmtp_revaliases:
   - user: root
     from: "root@{{ mail_hostname }}"

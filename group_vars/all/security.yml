@@ -3,14 +3,17 @@
 ferm_input_list:
   - type: dport_accept
     dport: [http]
+    saddr: "{{ (cloudflare_enabled | bool) | ternary(cloudflare_trusted_proxies_ipv4, []) }}"
     filename: nginx_accept
   - type: dport_accept
     dport: [https]
+    saddr: "{{ (cloudflare_enabled | bool) | ternary(cloudflare_trusted_proxies_ipv4, []) }}"
     filename: nginx_accept_https
     delete: "{{ not (sites_use_ssl | bool) }}"
   - type: dport_accept
     dport: ['443']
     protocol: udp
+    saddr: "{{ (cloudflare_enabled | bool) | ternary(cloudflare_trusted_proxies_ipv4, []) }}"
     filename: nginx_accept_http3
     delete: "{{ not (nginx_http3_enabled and (sites_use_ssl | bool)) }}"
   - type: dport_accept
