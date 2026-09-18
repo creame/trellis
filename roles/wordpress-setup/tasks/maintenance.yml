@@ -15,9 +15,9 @@
     cron_file: "wordpress-{{ item.key | replace('.', '_') }}"
   with_dict: "{{ wordpress_sites }}"
 
-- name: Setup WP WooCommerce maintenance cron
+- name: Setup WP WooCommerce daily maintenance cron
   cron:
-    name: "{{ item.key }} WooCommerce maintenance"
+    name: "{{ item.key }} WooCommerce daily maintenance"
     hour: "4"
     minute: "0"
     user: "{{ web_user }}"
@@ -25,8 +25,21 @@
       cd {{ www_root }}/{{ item.key }}/{{ item.value.current_path | default('current') }}
       && wp wc tool run verify_db_tables --user=admin.creame --quiet --skip-themes
       && wp wc tool run clear_expired_transients --user=admin.creame --quiet --skip-themes
-      && wp wc tool run delete_orphaned_variations --user=admin.creame --quiet --skip-themes
       && wp wc tool run clear_expired_download_permissions --user=admin.creame --quiet --skip-themes
+    cron_file: "wordpress-{{ item.key | replace('.', '_') }}"
+  with_dict: "{{ wordpress_sites }}"
+  when: item.value.woocommerce | default(false)
+
+- name: Setup WP WooCommerce weekly heavy maintenance cron
+  cron:
+    name: "{{ item.key }} WooCommerce weekly maintenance"
+    weekday: "0"
+    hour: "4"
+    minute: "5"
+    user: "{{ web_user }}"
+    job: >
+      cd {{ www_root }}/{{ item.key }}/{{ item.value.current_path | default('current') }}
+      && wp wc tool run delete_orphaned_variations --user=admin.creame --quiet --skip-themes
       && wp wc tool run recount_terms --user=admin.creame --quiet --skip-themes
       && wp wc tool run regenerate_product_lookup_tables --user=admin.creame --quiet --skip-themes
     cron_file: "wordpress-{{ item.key | replace('.', '_') }}"
