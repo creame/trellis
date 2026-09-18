@@ -91,8 +91,17 @@
     user: "{{ web_user }}"
     job: >
       cd {{ www_root }}/{{ item.key }}/{{ item.value.current_path | default('current') }}
+      && WP_BEFORE="$(wp core version --skip-plugins --skip-themes 2>/dev/null)"
       && wp core update --minor --quiet --skip-plugins --skip-themes
       && wp core update-db --quiet --skip-plugins --skip-themes
+      && WP_AFTER="$(wp core version --skip-plugins --skip-themes 2>/dev/null)"
+      && if [ "$WP_BEFORE" != "$WP_AFTER" ]; then
+           sudo service php{{ php_version }}-fpm reload >/dev/null 2>&1
+           || sudo service php{{ php_version }}-fpm restart >/dev/null 2>&1;
+         else
+           sudo service php{{ php_version }}-fpm status >/dev/null 2>&1
+           || sudo service php{{ php_version }}-fpm restart >/dev/null 2>&1;
+         fi
     cron_file: "wordpress-{{ item.key | replace('.', '_') }}"
   with_dict: "{{ wordpress_sites }}"
 
