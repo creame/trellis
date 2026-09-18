@@ -72,6 +72,17 @@
     cron_file: "wordpress-{{ item.key | replace('.', '_') }}"
   with_dict: "{{ wordpress_sites }}"
 
+- name: Setup WP DB backup retention cron
+  cron:
+    name: "{{ item.key }} WordPress DB backup retention"
+    hour: "4"
+    minute: "17"
+    user: "{{ web_user }}"
+    job: >
+      find {{ www_root }}/{{ item.key }}/backups -type f -name "backup-*.sql.gz" -mtime +60 -delete
+    cron_file: "wordpress-{{ item.key | replace('.', '_') }}"
+  with_dict: "{{ wordpress_sites }}"
+
 - name: Setup WP security updates cron
   cron:
     name: "{{ item.key }} WordPress security updates"
