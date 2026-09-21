@@ -6,6 +6,7 @@ apt_packages_custom:
   jpegoptim: "{{ apt_package_state }}"
   optipng: "{{ apt_package_state }}"
   webp: "{{ apt_package_state }}"
+  libavif-bin: "{{ apt_package_state }}"
 apt_clean_sources: true
 ansible_python_interpreter: /usr/bin/python3
 composer_keep_updated: true
