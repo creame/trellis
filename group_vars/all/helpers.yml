@@ -44,10 +44,10 @@ sites_using_ssl: "{{ wordpress_sites | dict2items | selectattr('value.ssl.enable
 first_site_using_ssl: "{{ (sites_using_ssl | dict2items | first | default(None, True)) }}"
 sites_use_ssl: "{{ sites_using_ssl | length > 0 }}"
 
-site_packagist_org_authentications:
+global_composer_authentications:
   - { hostname: packages.crea.me, username: creame, password: "{{ vault_creame_password | default('') }}" }
 site_composer_authentications: "{{ vault_wordpress_sites[site].composer_authentications | default([]) }}"
-composer_authentications: "{{ site_packagist_org_authentications + site_composer_authentications }}"
+composer_authentications: "{{ global_composer_authentications | default([]) + site_composer_authentications }}"
 # Default `type` is `http-basic`.
 composer_authentications_using_basic_auth: "{{ composer_authentications | rejectattr('type', 'defined') | union( composer_authentications | selectattr('type', 'defined') | selectattr('type', 'equalto', 'http-basic') ) }}"
 composer_authentications_using_bitbucket_oauth: "{{ composer_authentications | selectattr('type', 'defined') | selectattr('type', 'equalto', 'bitbucket-oauth') }}"
