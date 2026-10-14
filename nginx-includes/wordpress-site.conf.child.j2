@@ -46,6 +46,20 @@
   {% endblock %}
 
   {% block location_primary -%}
+  {% if nginx_block_seo_crawlers | default(false) -%}
+  # Block SEO crawlers
+  if ($http_user_agent ~* "(Timpibot|AhrefsBot|AhrefsSiteAudit|barkrowler|BLEXBot|DataForSeoBot|dotbot|rogerbot|SemrushBot|SiteAuditBot|SemrushBot-BA|SERankingBacklinksBot|AffsignalCrawler|YandexBot)") {
+    return 403;
+  }
+  {% endif -%}
+
+  {% if nginx_block_ai_bots | default(false) -%}
+  # Block AI bots
+  if ($http_user_agent ~* "(Amazonbot|Applebot-Extended|CCBot|ClaudeBot|GPTBot|Google-Extended|GoogleOther|Meta-ExternalAgent|FacebookBot)") {
+    return 403;
+  }
+  {% endif -%}
+
   # Based on Cache Enabler nginx config (https://www.keycdn.com/support/wordpress-cache-enabler-plugin#nginx)
 
   # cache directory

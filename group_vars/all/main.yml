@@ -23,6 +23,8 @@ nginx_conf: nginx-includes/nginx.conf.child.j2
 nginx_wordpress_site_conf: nginx-includes/wordpress-site.conf.child.j2
 nginx_skip_cache_cookie: comment_author|wordpress_[a-f0-9]+|wp-postpass|wordpress_no_cache|wordpress_logged_in|woocommerce_[a-z0-9_]+
 nginx_hsts_include_subdomains: true
+nginx_block_seo_crawlers: true
+nginx_block_ai_bots: false
 
 # Cloudflare
 cloudflare_enabled: false
