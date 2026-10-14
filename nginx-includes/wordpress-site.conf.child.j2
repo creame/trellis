@@ -12,14 +12,18 @@
   {% endblock -%}
 
   {% block location_uploads_php -%}
-  # Serve AVIF/WebP images (use ?original to force source image)
+  # Serve AVIF/WebP images (use ?source to force source image)
+  set $avif ".none";
+  set $webp ".none";
+
+  if ($http_accept ~ image/avif) { set $avif ".avif"; }
+  if ($http_accept ~ image/webp) { set $webp ".webp"; }
+  if ($arg_source)               { set $avif ".none"; set $webp ".none"; }
+
   location ~* ^/.+\.(png|gif|jpe?g)$ {
     add_header Vary Accept;
 
-    if ($arg_original) { try_files $uri =404; }
-    if ($http_accept ~ image/avif) { try_files $uri.avif $uri.webp $uri =404; }
-    if ($http_accept ~ image/webp) { try_files $uri.webp $uri =404; }
-    try_files $uri =404;
+    try_files $uri$avif $uri$webp $uri =404;
   }
 
   # Handle 404 for common static files
