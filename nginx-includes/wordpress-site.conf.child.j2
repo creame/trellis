@@ -12,20 +12,18 @@
   {% endblock -%}
 
   {% block location_uploads_php -%}
-  # Try to server WebP images (can skip with query ?nowebp)
-  set $webp_ext "";
-
-  if ($http_accept ~ image/webp) { set $webp_ext ".webp"; }
-  if ($arg_nowebp)               { set $webp_ext ".nowebp"; }
-
+  # Serve AVIF/WebP images (use ?original to force source image)
   location ~* ^/.+\.(png|gif|jpe?g)$ {
     add_header Vary Accept;
 
-    try_files $uri$webp_ext $uri =404;
+    if ($arg_original) { try_files $uri =404; }
+    if ($http_accept ~ image/avif) { try_files $uri.avif $uri.webp $uri =404; }
+    if ($http_accept ~ image/webp) { try_files $uri.webp $uri =404; }
+    try_files $uri =404;
   }
 
   # Handle 404 for common static files
-  location ~* ^/.+\.(css|js|gif|ico|jpe?g|png|svgz?|webp|webm|ttf|woff2?|otf|eot|rar|zip|t?gz)$ {
+  location ~* ^/.+\.(css|js|gif|ico|jpe?g|png|svgz?|webp|avif|webm|ttf|woff2?|otf|eot|rar|zip|t?gz)$ {
     try_files $uri =404;
   }
 
