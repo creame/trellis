@@ -17,6 +17,10 @@ wordpress_sites:
       provider: self-signed
     cache:
       enabled: false
+    object_cache:
+      enabled: true
+      provider: redis
+      database: 0
     xmlrpc:
       enabled: false
 

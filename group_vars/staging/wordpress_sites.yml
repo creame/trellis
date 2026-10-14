@@ -19,6 +19,10 @@ wordpress_sites:
       provider: letsencrypt
     cache:
       enabled: false
+    object_cache:
+      enabled: true
+      provider: redis
+      database: 0
     xmlrpc:
       enabled: false
     woocommerce: false
