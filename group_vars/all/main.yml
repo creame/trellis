@@ -67,6 +67,10 @@ php_extensions_custom:
   php8.3-soap: "{{ apt_package_state }}"
   php8.3-gd: "{{ apt_package_state }}"
 
+# Session
+memcached_sessions: false
+redis_sessions: false
+
 # WP-Cli
 # wp_cli_packages:
 #   - wp-cli/doctor-command
