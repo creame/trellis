@@ -125,9 +125,8 @@
     user: "{{ web_user }}"
     job: >
       cd {{ site_current }}/web/app/uploads
-      && find -type f -iname "*.jpg"  -mtime -1 -daystart -exec jpegoptim -qsp {} \;
-      && find -type f -iname "*.jpeg" -mtime -1 -daystart -exec jpegoptim -qsp {} \;
-      && find -type f -iname "*.png"  -mtime -1 -daystart -exec optipng -quiet -o5 -preserve -strip all {} \;
+      && find -type f \( -iname "*.jpg" -o -iname "*.jpeg" \) -daystart -mtime 1 -exec jpegoptim -qsp {} +
+      && find -type f -iname "*.png" -daystart -mtime 1 -exec optipng -quiet -o5 -preserve -strip all {} +
     cron_file: "{{ site_cron_file }}"
   when: image_optimize | default(false)
 
@@ -139,8 +138,7 @@
     user: "{{ web_user }}"
     job: >
       cd {{ site_current }}/web/app/uploads
-      && find -type f -iname "*.jpg"  -mtime -1 -daystart -exec sh -c 'cwebp -quiet -q 80 $1 -o "$1.webp"' _ {} \;
-      && find -type f -iname "*.jpeg" -mtime -1 -daystart -exec sh -c 'cwebp -quiet -q 80 $1 -o "$1.webp"' _ {} \;
-      && find -type f -iname "*.png"  -mtime -1 -daystart -exec sh -c 'cwebp -quiet -lossless $1 -o "$1.webp"' _ {} \;
+      && find -type f \( -iname "*.jpg" -o -iname "*.jpeg" \) -daystart -mtime 1 -exec sh -c 'for f; do cwebp -quiet -q 80 "$f" -o "$f.webp"; done' _ {} +
+      && find -type f -iname "*.png" -daystart -mtime 1 -exec sh -c 'for f; do cwebp -quiet -lossless "$f" -o "$f.webp"; done' _ {} +
     cron_file: "{{ site_cron_file }}"
   when: image_to_webp | default(false)
