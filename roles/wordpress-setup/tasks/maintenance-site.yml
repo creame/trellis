@@ -21,9 +21,9 @@
     user: "{{ web_user }}"
     job: >
       cd {{ site_current }}
-      && wp wc tool run verify_db_tables --user=admin.creame --quiet --skip-themes
-      && wp wc tool run clear_expired_transients --user=admin.creame --quiet --skip-themes
-      && wp wc tool run clear_expired_download_permissions --user=admin.creame --quiet --skip-themes
+      && wp wc tool run verify_db_tables --user={{ site_wc_user }} --quiet --skip-themes
+      && wp wc tool run clear_expired_transients --user={{ site_wc_user }} --quiet --skip-themes
+      && wp wc tool run clear_expired_download_permissions --user={{ site_wc_user }} --quiet --skip-themes
     cron_file: "{{ site_cron_file }}"
   when: item.value.woocommerce | default(false)
 
@@ -36,9 +36,9 @@
     user: "{{ web_user }}"
     job: >
       cd {{ site_current }}
-      && wp wc tool run delete_orphaned_variations --user=admin.creame --quiet --skip-themes
-      && wp wc tool run recount_terms --user=admin.creame --quiet --skip-themes
-      && wp wc tool run regenerate_product_lookup_tables --user=admin.creame --quiet --skip-themes
+      && wp wc tool run delete_orphaned_variations --user={{ site_wc_user }} --quiet --skip-themes
+      && wp wc tool run recount_terms --user={{ site_wc_user }} --quiet --skip-themes
+      && wp wc tool run regenerate_product_lookup_tables --user={{ site_wc_user }} --quiet --skip-themes
     cron_file: "{{ site_cron_file }}"
   when: item.value.woocommerce | default(false)
 

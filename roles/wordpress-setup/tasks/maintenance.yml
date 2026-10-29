@@ -8,3 +8,4 @@
     site_root: "{{ www_root }}/{{ item.key }}"
     site_current: "{{ site_root }}/{{ item.value.current_path | default('current') }}"
     site_cron_file: "wordpress-{{ item.key | replace('.', '_') }}"
+    site_wc_user: "{{ item.value.wc_cli_user | default('admin.creame') }}"
