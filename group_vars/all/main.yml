@@ -83,7 +83,7 @@ update_wp_theme_paths: false
 
 # Enable image optimization cron task and serve webp format
 image_optimize: true
-# image_to_webp: true
+image_to_webp: false
 
 # WordPress languages (others than default en_US)
 project_languages:

@@ -1,0 +1,146 @@
+---
+- name: Create WP backups directory
+  file:
+    path: "{{ site_root }}/backups"
+    owner: "{{ web_user }}"
+    group: "{{ web_group }}"
+    mode: 0755
+    state: directory
+
+- name: Setup MAILTO on WP cron
+  cronvar:
+    name: MAILTO
+    value: "{{ item.value.cron_mailto | default(mail_admin) }}"
+    cron_file: "{{ site_cron_file }}"
+
+- name: Setup WP WooCommerce daily maintenance cron
+  cron:
+    name: "{{ item.key }} WooCommerce daily maintenance"
+    hour: "4"
+    minute: "0"
+    user: "{{ web_user }}"
+    job: >
+      cd {{ site_current }}
+      && wp wc tool run verify_db_tables --user=admin.creame --quiet --skip-themes
+      && wp wc tool run clear_expired_transients --user=admin.creame --quiet --skip-themes
+      && wp wc tool run clear_expired_download_permissions --user=admin.creame --quiet --skip-themes
+    cron_file: "{{ site_cron_file }}"
+  when: item.value.woocommerce | default(false)
+
+- name: Setup WP WooCommerce weekly heavy maintenance cron
+  cron:
+    name: "{{ item.key }} WooCommerce weekly maintenance"
+    weekday: "0"
+    hour: "4"
+    minute: "5"
+    user: "{{ web_user }}"
+    job: >
+      cd {{ site_current }}
+      && wp wc tool run delete_orphaned_variations --user=admin.creame --quiet --skip-themes
+      && wp wc tool run recount_terms --user=admin.creame --quiet --skip-themes
+      && wp wc tool run regenerate_product_lookup_tables --user=admin.creame --quiet --skip-themes
+    cron_file: "{{ site_cron_file }}"
+  when: item.value.woocommerce | default(false)
+
+- name: Setup WP DB optimize cron
+  cron:
+    name: "{{ item.key }} WordPress DB optimize"
+    hour: "4"
+    minute: "10"
+    user: "{{ web_user }}"
+    job: >
+      cd {{ site_current }}
+      && wp transient delete --expired --quiet --skip-plugins --skip-themes
+      && wp db optimize --skip-plugins --skip-themes > /dev/null
+    cron_file: "{{ site_cron_file }}"
+
+- name: Setup WP DB backup cron
+  cron:
+    name: "{{ item.key }} WordPress DB backup"
+    hour: "4"
+    minute: "15"
+    user: "{{ web_user }}"
+    job: >
+      cd {{ site_current }}
+      && wp db export {{ site_root }}/backups/backup-`date +\%Y\%m\%dT041500`.sql --quiet --skip-plugins --skip-themes
+      && gzip -q {{ site_root }}/backups/backup-`date +\%Y\%m\%dT041500`.sql
+    cron_file: "{{ site_cron_file }}"
+
+- name: Setup WP DB backup retention cron
+  cron:
+    name: "{{ item.key }} WordPress DB backup retention"
+    hour: "4"
+    minute: "17"
+    user: "{{ web_user }}"
+    job: >
+      find {{ site_root }}/backups -type f -name "backup-*.sql.gz" -mtime +60 -delete
+    cron_file: "{{ site_cron_file }}"
+
+- name: Setup WP security updates cron
+  cron:
+    name: "{{ item.key }} WordPress security updates"
+    hour: "4"
+    minute: "20"
+    user: "{{ web_user }}"
+    job: >
+      cd {{ site_current }}
+      && WP_BEFORE="$(wp core version --skip-plugins --skip-themes 2>/dev/null)"
+      && wp core update --minor --quiet --skip-plugins --skip-themes
+      && wp core update-db --quiet --skip-plugins --skip-themes
+      && WP_AFTER="$(wp core version --skip-plugins --skip-themes 2>/dev/null)"
+      && if [ "$WP_BEFORE" != "$WP_AFTER" ];
+      then sudo service php{{ php_version }}-fpm reload >/dev/null 2>&1 || sudo service php{{ php_version }}-fpm restart >/dev/null 2>&1;
+      else sudo service php{{ php_version }}-fpm status >/dev/null 2>&1 || sudo service php{{ php_version }}-fpm restart >/dev/null 2>&1;
+      fi
+    cron_file: "{{ site_cron_file }}"
+
+- name: Setup WP languages updates cron
+  cron:
+    name: "{{ item.key }} WordPress languages updates"
+    hour: "4"
+    minute: "25"
+    user: "{{ web_user }}"
+    job: >
+      cd {{ site_current }}
+      && wp language core update --skip-plugins --skip-themes > /dev/null 2>&1
+      && wp language plugin update --all --skip-plugins --skip-themes > /dev/null 2>&1
+    cron_file: "{{ site_cron_file }}"
+
+- name: Setup Verify checksums cron
+  cron:
+    name: "{{ item.key }} WordPress verify checksums"
+    hour: "4"
+    minute: "30"
+    user: "{{ web_user }}"
+    job: >
+      cd {{ site_current }}
+      && wp core verify-checksums --skip-plugins --skip-themes > /dev/null
+    cron_file: "{{ site_cron_file }}"
+
+- name: Setup Image optimization cron
+  cron:
+    name: "{{ item.key }} image optimization"
+    hour: "1"
+    minute: "5"
+    user: "{{ web_user }}"
+    job: >
+      cd {{ site_current }}/web/app/uploads
+      && find -type f -iname "*.jpg"  -mtime -1 -daystart -exec jpegoptim -qsp {} \;
+      && find -type f -iname "*.jpeg" -mtime -1 -daystart -exec jpegoptim -qsp {} \;
+      && find -type f -iname "*.png"  -mtime -1 -daystart -exec optipng -quiet -o5 -preserve -strip all {} \;
+    cron_file: "{{ site_cron_file }}"
+  when: image_optimize | default(false)
+
+- name: Setup WebP conversion cron
+  cron:
+    name: "{{ item.key }} WebP conversion"
+    hour: "2"
+    minute: "5"
+    user: "{{ web_user }}"
+    job: >
+      cd {{ site_current }}/web/app/uploads
+      && find -type f -iname "*.jpg"  -mtime -1 -daystart -exec sh -c 'cwebp -quiet -q 80 $1 -o "$1.webp"' _ {} \;
+      && find -type f -iname "*.jpeg" -mtime -1 -daystart -exec sh -c 'cwebp -quiet -q 80 $1 -o "$1.webp"' _ {} \;
+      && find -type f -iname "*.png"  -mtime -1 -daystart -exec sh -c 'cwebp -quiet -lossless $1 -o "$1.webp"' _ {} \;
+    cron_file: "{{ site_cron_file }}"
+  when: image_to_webp | default(false)
