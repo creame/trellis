@@ -1,5 +1,15 @@
 {% extends 'roles/wordpress-setup/templates/wordpress-site.conf.j2' %}
 
+  {% set ce_cache_dir = '/app/cache/cache-enabler' %}
+
+  {% block server_before -%}
+  # try_files sets $uri to the file it serves, so this only matches Cache Enabler pages delivered by Nginx.
+  map $uri $nginx_cache_handler {
+    default "";
+    "~^{{ ce_cache_dir }}/" nginx;
+  }
+  {% endblock %}
+
   {% block logs -%}
   access_log   {{ www_root }}/{{ item.key }}/logs/access.log main;
   error_log    {{ www_root }}/{{ item.key }}/logs/error.log error;
@@ -66,33 +76,34 @@
 
   # Based on Cache Enabler nginx config (https://www.keycdn.com/support/wordpress-cache-enabler-plugin#nginx)
 
-  # cache directory
-  set $ce_cache_dir "/app/cache/cache-enabler";
-
-  # default cache keys
+  # Cache directory and default keys
+  set $ce_cache_dir             "{{ ce_cache_dir }}";
   set $ce_cache_key_scheme      "http-";
   set $ce_cache_key_device      "";
   set $ce_cache_key_compression "";
 
-  # scheme cache key
+  # Scheme cache key
   if ($scheme = https) {
     set $ce_cache_key_scheme "https-";
   }
 
-  # device cache key
+  # Device cache key
   if ($http_user_agent ~ "(Mobile|Android|Silk/|Kindle|BlackBerry|Opera Mini|Opera Mobi)") {
     set $ce_cache_key_device "-mobile";
   }
 
-  # compression cache key
+  # Compression cache key
   # if ($http_accept_encoding ~ gzip) {
   #   set $ce_cache_key_compression ".gz";
   # }
 
-  # get cache file
-  set $ce_cache_file_dir  ${ce_cache_dir}/${http_host}${uri};
-  set $ce_cache_file_name ${ce_cache_key_scheme}index${ce_cache_key_device}.html${ce_cache_key_compression};
-  set $ce_cache_file      ${ce_cache_file_dir}${ce_cache_file_name};
+  # Get cache file
+  set $ce_cache_dir  ${ce_cache_dir}/${http_host}${uri};
+  set $ce_cache_name ${ce_cache_key_scheme}index${ce_cache_key_device}.html${ce_cache_key_compression};
+  set $ce_cache_file ${ce_cache_dir}/${ce_cache_name};
+
+  # Add header for cache handler (only sent if served from cache)
+  add_header X-Cache-Handler $nginx_cache_handler;
 
   location / {
     error_page 405 = @fallback;
