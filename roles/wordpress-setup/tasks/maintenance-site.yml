@@ -4,7 +4,7 @@
     path: "{{ site_root }}/backups"
     owner: "{{ web_user }}"
     group: "{{ web_group }}"
-    mode: 0755
+    mode: 0700
     state: directory
 
 - name: Setup MAILTO on WP cron
@@ -42,15 +42,26 @@
     cron_file: "{{ site_cron_file }}"
   when: item.value.woocommerce | default(false)
 
-- name: Setup WP DB optimize cron
+- name: Setup WP expired transients cleanup cron
   cron:
-    name: "{{ item.key }} WordPress DB optimize"
+    name: "{{ item.key }} WordPress expired transients cleanup"
     hour: "4"
     minute: "10"
     user: "{{ web_user }}"
     job: >
       cd {{ site_current }}
       && wp transient delete --expired --quiet --skip-plugins --skip-themes
+    cron_file: "{{ site_cron_file }}"
+
+- name: Setup WP DB optimize cron
+  cron:
+    name: "{{ item.key }} WordPress DB optimize"
+    weekday: "0"
+    hour: "4"
+    minute: "10"
+    user: "{{ web_user }}"
+    job: >
+      cd {{ site_current }}
       && wp db optimize --skip-plugins --skip-themes > /dev/null
     cron_file: "{{ site_cron_file }}"
 
@@ -61,7 +72,8 @@
     minute: "15"
     user: "{{ web_user }}"
     job: >
-      cd {{ site_current }}
+      umask 077
+      && cd {{ site_current }}
       && wp db export {{ site_root }}/backups/backup-`date +\%Y\%m\%dT041500`.sql --quiet --skip-plugins --skip-themes
       && gzip -q {{ site_root }}/backups/backup-`date +\%Y\%m\%dT041500`.sql
     cron_file: "{{ site_cron_file }}"
@@ -104,6 +116,7 @@
       cd {{ site_current }}
       && wp language core update --skip-plugins --skip-themes > /dev/null 2>&1
       && wp language plugin update --all --skip-plugins --skip-themes > /dev/null 2>&1
+      && wp language theme update --all --skip-plugins --skip-themes > /dev/null 2>&1
     cron_file: "{{ site_cron_file }}"
 
 - name: Setup Verify checksums cron
