@@ -31,18 +31,39 @@
   retries: 3
   delay: 5
 
+# `present` never upgrades an existing install, so a bump of mariadb_version
+# would leave the old server running with a config rendered for the new one.
+- name: Get installed MariaDB version
+  command: dpkg-query -W -f='${Version}' mariadb-common
+  register: mariadb_installed_pkg
+  changed_when: false
+  failed_when: false
+
+- name: Check if MariaDB needs a version upgrade
+  set_fact:
+    mariadb_upgrade_needed: "{{ mariadb_installed_pkg.rc == 0 and mariadb_installed_pkg.stdout is regex('\\d+\\.\\d+') and (mariadb_installed_pkg.stdout | regex_search('\\d+\\.\\d+')) is version(mariadb_version | string, '<') }}"
+
 - name: Install MySQL client
   ansible.builtin.apt:
     name: "{{ mariadb_client_package }}"
-    state: "{{ mariadb_client_package_state | default(apt_package_state) }}"
+    state: "{{ 'latest' if mariadb_upgrade_needed | bool else (mariadb_client_package_state | default(apt_package_state)) }}"
     update_cache: true
 
 - block:
   - name: Install MySQL server
     ansible.builtin.apt:
       name: "{{ mariadb_server_package }}"
-      state: "{{ mariadb_server_package_state | default(apt_package_state) }}"
+      state: "{{ 'latest' if mariadb_upgrade_needed | bool else (mariadb_server_package_state | default(apt_package_state)) }}"
       cache_valid_time: "{{ apt_cache_valid_time }}"
+
+  - name: Get MariaDB server version
+    command: dpkg-query -W -f='${Version}' {{ mariadb_server_package }}
+    register: mariadb_server_pkg
+    changed_when: false
+
+  - name: Set MariaDB server version
+    set_fact:
+      mariadb_installed_version: "{{ mariadb_server_pkg.stdout | regex_search('\\d+\\.\\d+') }}"
 
   - name: Disable MariaDB binary logging
     template:
