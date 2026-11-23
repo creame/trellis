@@ -110,7 +110,7 @@
     recursive_error_pages on;
 
     # check request method
-    if ($request_method != GET) {
+    if ($request_method !~ ^(GET|HEAD)$) {
       return 405;
     }
 
